@@ -12,9 +12,7 @@ public class Main {
             --- create a token object for each token
             --- assign the token enum to that object instance
             --- assigns token data to that instasnce such as the type, value and possibly location?
-
             - make a parser
-
             - make the interpreter
          */
     }
