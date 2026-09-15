@@ -63,7 +63,7 @@ public enum TokenEnums {
     greaterThan, // >
     lessEqualTo, // <=
     greaterEqualTo, // >=
-    notEqualTo, // <>>
+    notEqualTo, // <>
     // strings and concatenators
     doubleQuote, // "
     singleQuote, // '
