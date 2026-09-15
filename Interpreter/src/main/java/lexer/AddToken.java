@@ -8,12 +8,11 @@ public class AddToken {
 
     public AddToken() {}
 
-    public void add(Token token, TokenEnums tokenEnums, String character) {
+    public void add(Token token, TokenEnums tokenEnums) {
         ArrayList<Object> tokenObject = new ArrayList<Object>();
 
         tokenObject.add(token);
         tokenObject.add(tokenEnums);
-        tokenObject.add(character);
 
         this.tokenArray.add(tokenObject);
     }

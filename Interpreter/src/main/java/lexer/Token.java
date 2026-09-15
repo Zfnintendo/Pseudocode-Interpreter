@@ -3,18 +3,18 @@ package lexer;
 public class Token {
 
     // token data
-    String type;
+    TokenType type;
     String value;
     TokenLocation location;
 
 
-    public Token(String type, String value, TokenLocation location) {
+    public Token(TokenType type, String value, TokenLocation location) {
         this.type = type;
         this.value = value;
         this.location = location;
     }
 
-    public String getType() {
+    public TokenType getType() {
         return this.type;
     }
 

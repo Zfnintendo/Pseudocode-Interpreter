@@ -2,19 +2,19 @@ package lexer;
 
 public class TokenLocation {
 
-    Integer line;
-    Integer column;
+    int line;
+    int column;
 
-    public TokenLocation(Integer line, Integer column) {
+    public TokenLocation(int line, int column) {
         this.line = line;
         this.column = column;
     }
 
-    public Integer getLine() {
+    public int getLine() {
         return this.line;
     }
 
-    public Integer getColumn() {
+    public int getColumn() {
         return this.column;
     }
 
