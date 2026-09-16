@@ -99,7 +99,7 @@ public enum TokenEnums {
     round,
     random,
 
-    //line handling
+    // file handling
     openFile,
     readFile,
     writeFile,
@@ -110,5 +110,5 @@ public enum TokenEnums {
 
     // other tokens
     newLine,
-    eof, // end of line token
+    eof, // end of file token
 }
