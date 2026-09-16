@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 public class AddToken {
 
-    ArrayList<ArrayList<Object>> tokenArray = new ArrayList<ArrayList<Object>>();
+    private ArrayList<ArrayList<Object>> tokenArray = new ArrayList<ArrayList<Object>>();
 
     public AddToken() {}
 
-    public void add(Token token, TokenEnums tokenEnums) {
+    public void addToLine(Token token, TokenEnums tokenEnums) {
         ArrayList<Object> tokenObject = new ArrayList<Object>();
 
         tokenObject.add(token);

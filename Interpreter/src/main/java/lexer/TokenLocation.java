@@ -2,8 +2,8 @@ package lexer;
 
 public class TokenLocation {
 
-    int line;
-    int column;
+    private int line;
+    private int column;
 
     public TokenLocation(int line, int column) {
         this.line = line;

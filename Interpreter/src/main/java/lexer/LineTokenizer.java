@@ -2,8 +2,8 @@ package lexer;
 
 public class LineTokenizer {
 
-    String line;
-    int lineNumber;
+    private String line;
+    private int lineNumber;
 
     public LineTokenizer(String line, int lineNumber) {
         this.line = line;
@@ -23,82 +23,82 @@ public class LineTokenizer {
                 }
                 case '+': {
                     Token token = new Token(TokenType.operator, "+", tokenLocation);
-                    addToken.add(token, TokenEnums.addition);
+                    addToken.addToLine(token, TokenEnums.addition);
                     break;
                 }
                 case '-': {
                     Token token = new Token(TokenType.operator, "-", tokenLocation);
-                    addToken.add(token, TokenEnums.addition);
+                    addToken.addToLine(token, TokenEnums.addition);
                     break;
                 }
                 case '*': {
                     Token token = new Token(TokenType.operator, "*", tokenLocation);
-                    addToken.add(token, TokenEnums.multiplication);
+                    addToken.addToLine(token, TokenEnums.multiplication);
                     break;
                 }
                 case '/': {
                     Token token = new Token(TokenType.operator, "/", tokenLocation);
-                    addToken.add(token, TokenEnums.division);
+                    addToken.addToLine(token, TokenEnums.division);
                     break;
                 }
                 case '^': {
                     Token token = new Token(TokenType.operator, "^", tokenLocation);
-                    addToken.add(token, TokenEnums.exponent);
+                    addToken.addToLine(token, TokenEnums.exponent);
                     break;
                 }
                 case '=': {
                     Token token = new Token(TokenType.operator, "=", tokenLocation);
-                    addToken.add(token, TokenEnums.equals);
+                    addToken.addToLine(token, TokenEnums.equals);
                     break;
                 }
                 case '<': {
                     Token token = new Token(TokenType.operator, "<", tokenLocation);
-                    addToken.add(token, TokenEnums.lessThan);
+                    addToken.addToLine(token, TokenEnums.lessThan);
                     break;
                 }
                 case '>': {
                     Token token = new Token(TokenType.operator, ">", tokenLocation);
-                    addToken.add(token, TokenEnums.greaterThan);
+                    addToken.addToLine(token, TokenEnums.greaterThan);
                     break;
                 }
                 case '(': {
                     Token token = new Token(TokenType.punctuation, "(", tokenLocation);
-                    addToken.add(token, TokenEnums.leftParen);
+                    addToken.addToLine(token, TokenEnums.leftParen);
                     break;
                 }
                 case ')': {
                     Token token = new Token(TokenType.punctuation, ")", tokenLocation);
-                    addToken.add(token, TokenEnums.rightParen);
+                    addToken.addToLine(token, TokenEnums.rightParen);
                     break;
                 }
                 case '[': {
                     Token token = new Token(TokenType.punctuation, "[", tokenLocation);
-                    addToken.add(token, TokenEnums.leftBracket);
+                    addToken.addToLine(token, TokenEnums.leftBracket);
                     break;
                 }
                 case ']': {
                     Token token = new Token(TokenType.punctuation, "]", tokenLocation);
-                    addToken.add(token, TokenEnums.rightBracket);
+                    addToken.addToLine(token, TokenEnums.rightBracket);
                     break;
                 }
                 case '"': {
                     Token token = new Token(TokenType.punctuation, "\"", tokenLocation);
-                    addToken.add(token, TokenEnums.doubleQuote);
+                    addToken.addToLine(token, TokenEnums.doubleQuote);
                     break;
                 }
                 case '\'': {
                     Token token = new Token(TokenType.punctuation, "'", tokenLocation);
-                    addToken.add(token, TokenEnums.singleQuote);
+                    addToken.addToLine(token, TokenEnums.singleQuote);
                     break;
                 }
                 case ',': {
                     Token token = new Token(TokenType.punctuation, ",", tokenLocation);
-                    addToken.add(token, TokenEnums.comma);
+                    addToken.addToLine(token, TokenEnums.comma);
                     break;
                 }
                 case ':': {
                     Token token = new Token(TokenType.punctuation, ":", tokenLocation);
-                    addToken.add(token, TokenEnums.colon);
+                    addToken.addToLine(token, TokenEnums.colon);
                     break;
                 }
                 default: {

@@ -3,9 +3,9 @@ package lexer;
 public class Token {
 
     // token data
-    TokenType type;
-    String value;
-    TokenLocation location;
+    private TokenType type;
+    private String value;
+    private TokenLocation location;
 
 
     public Token(TokenType type, String value, TokenLocation location) {
