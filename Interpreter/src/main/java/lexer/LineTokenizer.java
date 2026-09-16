@@ -1,9 +1,13 @@
 package lexer;
 
+import java.util.ArrayList;
+
 // use this class by creating a new instance of it then calling tokenize to get the table of tokens
 
 /*future todo when not lazy
- - create a function or method for every string builder
+          - create a function or method for every string builder
+          - make a recursive function for identifiers and literals
+          -- could do this by having after the first blank character check to check for future characters and find a " " to stop it and then reoccur the function to find if there are any tokens and then
  */
 
 public class LineTokenizer {
@@ -16,7 +20,7 @@ public class LineTokenizer {
         this.lineNumber = lineNumber;
     }
 
-    public void tokenize() {
+    public ArrayList<ArrayList<Object>> tokenize() {
         AddToken addToken = new AddToken();
 
         for (int i = 0; i < this.line.length(); i++) {
@@ -539,6 +543,19 @@ public class LineTokenizer {
         TokenLocation tokenLocation = new TokenLocation(this.lineNumber, this.line.length());
         Token token = new Token(TokenType.control, "", tokenLocation);
         addToken.addToLine(token, TokenEnums.eol);
+
+        return addToken.getTokens();
+
+    } // end of method tokenize
+
+    // recursive methods
+
+
+    public void tryIdentifier(String str, AddToken addtoken) {
+
+    }
+
+    public void tryLiteral(String str, AddToken addtoken) {
 
     }
 
