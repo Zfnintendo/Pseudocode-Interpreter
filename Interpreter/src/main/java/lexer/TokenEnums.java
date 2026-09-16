@@ -28,10 +28,10 @@ public enum TokenEnums {
 
     // procedures and functions
     procedure,
-    endProcedure,
+    endProcedure, // end pro ced ure 12
     // function
     function,
-    endFunction,
+    endFunction, // end fun cti on 11
     tokenReturn, // like return x+x
     returns, //  like function(): int
     call,

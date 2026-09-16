@@ -34,7 +34,7 @@ public class LineTokenizer {
                 }
                 case '-': {
                     Token token = new Token(TokenType.operator, "-", tokenLocation);
-                    addToken.addToLine(token, TokenEnums.addition);
+                    addToken.addToLine(token, TokenEnums.subtraction);
                     break;
                 }
                 case '*': {
@@ -419,8 +419,120 @@ public class LineTokenizer {
             char c7 = this.line.charAt(i+7);
             sb0.append(c7);
             switch(sb0.toString()) {
+                case "FUNCTION": {
+                    Token token = new Token(TokenType.keyword, "FUNCTION", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.function);
+                    i += 7;
+                    break;
+                }
+                case "CONSTANT": {
+                    Token token = new Token(TokenType.keyword, "CONSTANT", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.constant);
+                    i += 7;
+                    break;
+                }
+                case "ENDWHILE": {
+                    Token token = new Token(TokenType.keyword, "ENDWHILE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.endWhile);
+                    i += 7;
+                    break;
+                }
+                case "OPENFILE": {
+                    Token token = new Token(TokenType.keyword, "OPENFILE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.openFile);
+                    i += 7;
+                    break;
+                }
+                case "READFILE": {
+                    Token token = new Token(TokenType.keyword, "READFILE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.readFile);
+                    i += 7;
+                    break;
+                }
+            } // end of the eighth switch
 
-            }
+
+            if (i+8 >= this.line.length()) { continue; }
+
+
+            // start of ninth switch
+            char c8 = this.line.charAt(i+8);
+            sb0.append(c8);
+            switch(sb0.toString()) {
+                case "PROCEDURE": {
+                    Token token = new Token(TokenType.keyword, "PROCEDURE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.procedure);
+                    i += 8;
+                    break;
+                }
+                case "OTHERWISE": {
+                    Token token = new Token(TokenType.keyword, "OTHERWISE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.otherwise);
+                    i += 8;
+                    break;
+                }
+                case "SUBSTRING": {
+                    Token token = new Token(TokenType.keyword, "SUBSTRING", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.subString);
+                    i += 8;
+                    break;
+                }
+                case "WRITEFILE": {
+                    Token token = new Token(TokenType.keyword, "WRITEFILE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.writeFile);
+                    i += 8;
+                    break;
+                }
+                case "CLOSEFILE": {
+                    Token token = new Token(TokenType.keyword, "CLOSEFILE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.closeFile);
+                    i += 8;
+                    break;
+                }
+            } // end of ninth switch
+
+
+            if (i+9 >= this.line.length()) { continue; }
+
+
+            // start of tenth switch
+            char c9 = this.line.charAt(i+9);
+            sb0.append(c9);
+            switch(sb0.toString()) { // we just make switches up until the last one in case we need to add more keywords in the future!
+
+            } // end of tenth swtich
+
+
+            if (i+10 >= this.line.length()) { continue; }
+
+
+            // start of eleven switch
+            char c10 = this.line.charAt(i+10);
+            sb0.append(c10);
+            switch(sb0.toString()) {
+                case "ENDFUNCTION": {
+                    Token token = new Token(TokenType.keyword, "ENDFUNCTION", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.endFunction);
+                    i += 10;
+                    break;
+                }
+            } // end of eleventh switch
+
+
+            if (i+11 >= this.line.length()) { continue; }
+
+
+            // start of twelth and FINAL switch!
+            char c11 = this.line.charAt(i+11);
+            sb0.append(c11);
+            switch(sb0.toString()) {
+                case "ENDPROCEDURE": {
+                    Token token = new Token(TokenType.keyword, "ENDPROCEDURE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.endProcedure);
+                    i += 11;
+                    break;
+                }
+            } // end of twelth switch
 
         } // end of for loop
 
