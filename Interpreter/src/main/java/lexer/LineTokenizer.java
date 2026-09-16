@@ -166,8 +166,7 @@ public class LineTokenizer {
             char c2 = this.line.charAt(i+2);
             StringBuilder sb0 = new StringBuilder(stringA);
             sb0.append(c2);
-            String stringB = sb0.toString();
-            switch(stringB) {
+            switch(sb0.toString()) {
                 case "DIV": {
                     Token token = new Token(TokenType.keyword, "DIV", tokenLocation);
                     addToken.addToLine(token, TokenEnums.div);
@@ -206,17 +205,167 @@ public class LineTokenizer {
 
             // Start of fourth switch
             char c3 = this.line.charAt(i+3);
-            StringBuilder sb1 = new StringBuilder(stringB);
-            sb1.append(c3);
-            String stringC = sb1.toString();
-            switch(stringC) {
+            sb0.append(c3);
+            switch(sb0.toString()) {
                 case "REAL": {
                     Token token = new Token(TokenType.keyword, "REAL", tokenLocation);
                     addToken.addToLine(token, TokenEnums.typeReal);
                     i += 3;
                     break;
                 }
+                case "CHAR": {
+                    Token token = new Token(TokenType.keyword, "CHAR", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.typeChar);
+                    i += 3;
+                    break;
+                }
+                case "CALL": {
+                    Token token = new Token(TokenType.keyword, "CALL", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.call);
+                    i += 3;
+                    break;
+                }
+                case "THEN": {
+                    Token token = new Token(TokenType.keyword, "THEN", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.then);
+                    i += 3;
+                    break;
+                }
+                case "ELSE": {
+                    Token token = new Token(TokenType.keyword, "ELSE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.tokenElse);
+                    i += 3;
+                    break;
+                }
+                case "NEXT": {
+                    Token token = new Token(TokenType.keyword, "NEXT", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.next);
+                    i += 3;
+                    break;
+                }
+                case "CASE": {
+                    Token token = new Token(TokenType.keyword, "CASE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.tokenCase);
+                    i += 3;
+                    break;
+                }
+                case "READ": {
+                    Token token = new Token(TokenType.keyword, "READ", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.read);
+                    i += 3;
+                    break;
+                }
             } // end of fourth switch
+
+
+            if (i+4 >= this.line.length()) { continue; }
+
+
+            // start of fifth switch
+            char c4 = this.line.charAt(i+4);
+            sb0.append(c4);
+            switch(sb0.toString()) {
+                case "ARRAY": {
+                    Token token = new Token(TokenType.keyword, "ARRAY", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.typeArray);
+                    i += 4;
+                    break;
+                }
+                case "ENDIF": {
+                    Token token = new Token(TokenType.keyword, "ENDIF", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.endIf);
+                    i += 4;
+                    break;
+                }
+                case "UNTIL": {
+                    Token token = new Token(TokenType.keyword, "UNTIL", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.until);
+                    i += 4;
+                    break;
+                }
+                case "WHILE": {
+                    Token token = new Token(TokenType.keyword, "WHILE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.tokenWhile);
+                    i += 4;
+                    break;
+                }
+                case "INPUT": {
+                    Token token = new Token(TokenType.keyword, "INPUT", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.input);
+                    i += 4;
+                    break;
+                }
+                case "ROUND": {
+                    Token token = new Token(TokenType.keyword, "ROUND", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.round);
+                    i += 4;
+                    break;
+                }
+                case "UCASE": {
+                    Token token = new Token(TokenType.keyword, "UCASE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.uCase);
+                    i += 4;
+                    break;
+                }
+                case "LCASE": {
+                    Token token = new Token(TokenType.keyword, "LCASE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.lCase);
+                    i += 4;
+                    break;
+                }
+                case "WRITE": {
+                    Token token = new Token(TokenType.keyword, "WRITE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.write);
+                    i += 4;
+                    break;
+                }
+            }// end of fifth switch
+
+
+            if (i+5 >= this.line.length()) { continue; }
+
+
+            // Start of sixth switch
+            char c5 = this.line.charAt(i+5);
+            sb0.append(c5);
+            switch(sb0.toString()) {
+                case "STRING": {
+                    Token token = new Token(TokenType.keyword, "STRING", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.typeString);
+                    i += 5;
+                    break;
+                }
+                case "RETURN": {
+                    Token token = new Token(TokenType.keyword, "RETURN", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.tokenReturn);
+                    i += 5;
+                    break;
+                }
+                case "REPEAT": {
+                    Token token = new Token(TokenType.keyword, "REPEAT", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.repeat);
+                    i += 5;
+                    break;
+                }
+                case "OUTPUT": {
+                    Token token = new Token(TokenType.keyword, "OUTPUT", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.output);
+                    i += 5;
+                    break;
+                }
+                case "RANDOM": {
+                    Token token = new Token(TokenType.keyword, "RANDOM", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.random);
+                    i += 5;
+                    break;
+                }
+                case "LENGTH": {
+                    Token token = new Token(TokenType.keyword, "LENGTH", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.length);
+                    i += 5;
+                    break;
+                }
+            } // end of six switch
 
 
 

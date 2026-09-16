@@ -98,6 +98,11 @@ public enum TokenEnums {
     // round and random
     round,
     random,
+    // string handling
+    length,
+    uCase,
+    lCase,
+    subString,
 
     // file handling
     openFile,
