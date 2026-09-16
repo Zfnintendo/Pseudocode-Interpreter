@@ -109,6 +109,6 @@ public enum TokenEnums {
     write,
 
     // other tokens
-    newLine,
+    eol, // end of line token
     eof, // end of file token
 }

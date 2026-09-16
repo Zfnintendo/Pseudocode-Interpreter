@@ -8,5 +8,6 @@ public enum TokenType {
     operator,
     punctuation,
     string,
+    control,
 
 }
