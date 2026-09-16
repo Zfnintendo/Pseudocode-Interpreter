@@ -2,6 +2,10 @@ package lexer;
 
 // use this class by creating a new instance of it then calling tokenize to get the table of tokens
 
+/*future todo when not lazy
+ - create a function or method for every string builder
+ */
+
 public class LineTokenizer {
 
     private String line;
@@ -368,6 +372,55 @@ public class LineTokenizer {
             } // end of six switch
 
 
+            if (i+6 >= this.line.length()) { continue; }
+
+
+            // start of seventh switch
+            char c6 = this.line.charAt(i+6);
+            sb0.append(c6);
+            switch(sb0.toString()) {
+                case "INTEGER": {
+                    Token token = new Token(TokenType.keyword, "INTEGER", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.typeInteger);
+                    i += 6;
+                    break;
+                }
+                case "BOOLEAN": {
+                    Token token = new Token(TokenType.keyword, "BOOLEAN", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.typeBoolean);
+                    i += 6;
+                    break;
+                }
+                case "RETURNS": {
+                    Token token = new Token(TokenType.keyword, "RETURNS", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.returns);
+                    i += 6;
+                    break;
+                }
+                case "DECLARE": {
+                    Token token = new Token(TokenType.keyword, "DECLARE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.declare);
+                    i += 6;
+                    break;
+                }
+                case "ENDCASE": {
+                    Token token = new Token(TokenType.keyword, "ENDCASE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.endCase);
+                    i += 6;
+                    break;
+                }
+            }// end of seventh switch
+
+
+            if (i+7 >= this.line.length()) { continue; }
+
+
+            // start of eighth switch
+            char c7 = this.line.charAt(i+7);
+            sb0.append(c7);
+            switch(sb0.toString()) {
+
+            }
 
         } // end of for loop
 
