@@ -7,7 +7,7 @@ public enum TokenEnums {
     // default token incase needed
     tokenDefault,
 
-    // types | int, real, char, str, bool
+    // types | INTEGER, REAL, CHAR, STRING, BOOLEAN
     typeInteger,
     typeReal,
     typeChar,
@@ -74,7 +74,7 @@ public enum TokenEnums {
     of, // OF
     constant,
     // if statements
-    tokenIf,
+    tokenIf, // if
     then,
     tokenElse,
     endIf,
@@ -85,7 +85,7 @@ public enum TokenEnums {
     tokenWhile,
     endWhile,
     //  for loop
-    tokenFor,
+    tokenFor, // for
     next,
     // case
     tokenCase,
