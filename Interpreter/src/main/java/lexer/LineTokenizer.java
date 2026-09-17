@@ -19,7 +19,7 @@ public class LineTokenizer {
 
     // apparently this is O(1) lookup so we do it this way
     private static final boolean[] endChar = new boolean[128];
-    Set<String> keywordStrings = new HashSet<>();
+    private static final Set<String> keywordStrings = new HashSet<>();
 
     static {
         endChar[' '] =  true;
@@ -38,6 +38,67 @@ public class LineTokenizer {
         endChar[':'] = true;
         endChar[','] = true;
 
+        keywordStrings.add("<-");
+        keywordStrings.add("OR");
+        keywordStrings.add("<=");
+        keywordStrings.add(">=");
+        keywordStrings.add("<>");
+        keywordStrings.add("OF");
+        keywordStrings.add("IF");
+
+        keywordStrings.add("AND");
+        keywordStrings.add("DIV");
+        keywordStrings.add("MOD");
+        keywordStrings.add("NOT");
+        keywordStrings.add("FOR");
+
+        keywordStrings.add("REAL");
+        keywordStrings.add("CHAR");
+        keywordStrings.add("CALL");
+        keywordStrings.add("THEN");
+        keywordStrings.add("ELSE");
+        keywordStrings.add("NEXT");
+        keywordStrings.add("CASE");
+        keywordStrings.add("READ");
+
+        keywordStrings.add("ARRAY");
+        keywordStrings.add("ENDIF");
+        keywordStrings.add("UNTIL");
+        keywordStrings.add("WHILE");
+        keywordStrings.add("INPUT");
+        keywordStrings.add("ROUND");
+        keywordStrings.add("UCASE");
+        keywordStrings.add("LCASE");
+        keywordStrings.add("WRITE");
+
+        keywordStrings.add("STRING");
+        keywordStrings.add("RETURN");
+        keywordStrings.add("REPEAT");
+        keywordStrings.add("OUTPUT");
+        keywordStrings.add("RANDOM");
+        keywordStrings.add("LENGTH");
+
+        keywordStrings.add("INTEGER");
+        keywordStrings.add("BOOLEAN");
+        keywordStrings.add("RETURNS");
+        keywordStrings.add("DECLARE");
+        keywordStrings.add("ENDCASE");
+
+        keywordStrings.add("FUNCTION");
+        keywordStrings.add("CONSTANT");
+        keywordStrings.add("ENDWHILE");
+        keywordStrings.add("OPENFILE");
+        keywordStrings.add("READFILE");
+
+        keywordStrings.add("PROCEDURE");
+        keywordStrings.add("OTHERWISE");
+        keywordStrings.add("SUBSTRING");
+        keywordStrings.add("WRITEFILE");
+        keywordStrings.add("CLOSEFILE");
+
+        keywordStrings.add("ENDFUNCTION");
+
+        keywordStrings.add("ENDPROCEDURE");
     }
 
     public LineTokenizer(String line, int lineNumber) {
