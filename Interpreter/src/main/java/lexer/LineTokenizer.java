@@ -1,6 +1,7 @@
 package lexer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 // use this class by creating a new instance of it then calling tokenize to get the table of tokens
 
@@ -15,6 +16,27 @@ public class LineTokenizer {
     private String line;
     private int lineNumber;
 
+    // apparently this is O(1) lookup so we do it this way
+    private static final boolean[] endChar = new boolean[128];
+
+    static {
+        endChar[' '] =  true;
+        endChar['+'] = true;
+        endChar['-'] = true;
+        endChar['*'] = true;
+        endChar['/'] = true;
+        endChar['^'] = true;
+        endChar['='] = true;
+        endChar['<'] = true;
+        endChar['>'] = true;
+        endChar['('] = true;
+        endChar[')'] = true;
+        endChar['['] = true;
+        endChar[']'] = true;
+        endChar[':'] = true;
+        endChar[','] = true;
+    }
+
     public LineTokenizer(String line, int lineNumber) {
         this.line = line;
         this.lineNumber = lineNumber;
@@ -28,6 +50,7 @@ public class LineTokenizer {
 
             char c0 = this.line.charAt(i);
             switch(c0) { // check for symbol tokens or 1 character tokens | ONE CHARACTER STARTS HERE!
+                // i know this might not be optimal because we have endChar and we could do something about that but I'm lazy so we are not doing that
                 case ' ': {
                     break; // do nothing
                 }
@@ -94,11 +117,41 @@ public class LineTokenizer {
                 case '"': {
                     Token token = new Token(TokenType.punctuation, "\"", tokenLocation);
                     addToken.addToLine(token, TokenEnums.doubleQuote);
+
+                    // build string literal
+                    StringBuilder sb = new StringBuilder();
+                    i++;
+
+                    while ( this.line.charAt(i) != '"' ) {
+
+                        sb.append(this.line.charAt(i));
+                        i++;
+
+                        if (i >= this.line.length()) { break; }// replace with throw error message later as this is when its longer than the line therefore error
+                    }
+
+                    tokenLocation.changeColumn(i);
+                    Token stringLiteralToken = new Token(TokenType.literals, sb.toString(), tokenLocation);
+                    addToken.addToLine(stringLiteralToken, TokenEnums.literalString);
+
                     break;
                 }
                 case '\'': {
                     Token token = new Token(TokenType.punctuation, "'", tokenLocation);
                     addToken.addToLine(token, TokenEnums.singleQuote);
+
+                    if ( this.line.charAt(i+2) != '\'') { break; }// replace with throw error because expected '
+
+                    i++;
+
+                    tokenLocation.changeColumn(i);
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(this.line.charAt(i));
+
+                    Token charLiteralToken = new Token(TokenType.literals, sb.toString(), tokenLocation);
+                    addToken.addToLine(charLiteralToken, TokenEnums.literalChar);
+
                     break;
                 }
                 case ',': {
@@ -110,6 +163,59 @@ public class LineTokenizer {
                     Token token = new Token(TokenType.punctuation, ":", tokenLocation);
                     addToken.addToLine(token, TokenEnums.colon);
                     break;
+                }
+                default: {/*
+                    "I assume keywords are a subset of identifiers.
+
+                    You should not rely on the lexer to find keywords. Instead your lexer should only look for identifiers, greedily, i.e. it should match the longest sequence of characters that constitutes an identifier.
+
+                    When it finds one, you should check yourself if the text of the identifier is one of the keywords. If it is, return a KEYWORD token, else return an IDENTIFIER token."
+
+                    -- some dude on stack overflow
+                    */
+
+                    // we check for integer and real literals
+
+                    boolean isReal = false;
+                    boolean isInt = false;
+
+                    StringBuilder sb = new StringBuilder();
+                    while ( Character.isDigit(this.line.charAt(i)) ) {
+                        sb.append(this.line.charAt(i));
+                        i++;
+                        isInt = true;
+                    }
+
+                    if (this.line.charAt(i) == '.') {
+                        i++;
+                        while ( Character.isDigit(this.line.charAt(i)) ) {
+                            sb.append(this.line.charAt(i));
+                            i++;
+                        }
+                        isInt = false;
+                        isReal = true;
+                    }
+
+                    if (isInt) {
+                        Token token = new Token(TokenType.literals, sb.toString(), tokenLocation);
+                        addToken.addToLine(token, TokenEnums.literalInteger);
+                        break;
+                    } else if (isReal) {
+                        Token token = new Token(TokenType.literals, sb.toString(), tokenLocation);
+                        addToken.addToLine(token, TokenEnums.literalReal);
+                        break;
+                    }
+
+                    // end of check for int and real literals
+
+                    // check for a terminating symbol or character to recognise an identifier which is a character
+                    if ( this.line.charAt(i+1) < 128 && endChar[this.line.charAt(i+1)]) {
+                        Token token = new Token(TokenType.identifier, String.valueOf(this.line.charAt(i)), tokenLocation);
+                        addToken.addToLine(token, TokenEnums.identifier);
+                        break;
+                    }
+
+
                 }
             } // end of first switch
 
@@ -548,15 +654,7 @@ public class LineTokenizer {
 
     } // end of method tokenize
 
-    // recursive methods
 
 
-    public void tryIdentifier(String str, AddToken addtoken) {
-
-    }
-
-    public void tryLiteral(String str, AddToken addtoken) {
-
-    }
 
 }

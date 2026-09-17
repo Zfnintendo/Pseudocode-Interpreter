@@ -18,4 +18,12 @@ public class TokenLocation {
         return this.column;
     }
 
+    public void changeLine(int line) {
+        this.line = line;
+    }
+
+    public void changeColumn(int column) {
+        this.column = column;
+    }
+
 }
