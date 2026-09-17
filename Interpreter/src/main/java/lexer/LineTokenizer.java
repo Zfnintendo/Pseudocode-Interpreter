@@ -277,8 +277,24 @@ public class LineTokenizer {
                         break;
                     }
 
+                    // check for keywords and if the word is not a keyword then register as an identifier
+                    int j = i;
+                    while ( !Character.isDigit(this.line.charAt(j)) && endChar[this.line.charAt(j)] ) {
+                        sb.append(this.line.charAt(j));
+                        j++;
+                    }
 
-                }
+
+                    if ( !keywordStrings.contains( sb.toString() ) ) {
+                        Token token = new Token(TokenType.identifier, sb.toString(), tokenLocation);
+                        addToken.addToLine(token, TokenEnums.identifier);
+                        i = j;
+                        break;
+                    }
+                    // end for check
+
+                    break;
+                } // end of default
             } // end of first switch
 
 
