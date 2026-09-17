@@ -2,6 +2,7 @@ package lexer;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 // use this class by creating a new instance of it then calling tokenize to get the table of tokens
 
@@ -18,6 +19,7 @@ public class LineTokenizer {
 
     // apparently this is O(1) lookup so we do it this way
     private static final boolean[] endChar = new boolean[128];
+    Set<String> keywordStrings = new HashSet<>();
 
     static {
         endChar[' '] =  true;
@@ -35,6 +37,7 @@ public class LineTokenizer {
         endChar[']'] = true;
         endChar[':'] = true;
         endChar[','] = true;
+
     }
 
     public LineTokenizer(String line, int lineNumber) {
@@ -146,10 +149,7 @@ public class LineTokenizer {
 
                     tokenLocation.changeColumn(i);
 
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(this.line.charAt(i));
-
-                    Token charLiteralToken = new Token(TokenType.literals, sb.toString(), tokenLocation);
+                    Token charLiteralToken = new Token(TokenType.literals, String.valueOf(this.line.charAt(i)), tokenLocation);
                     addToken.addToLine(charLiteralToken, TokenEnums.literalChar);
 
                     break;
@@ -207,6 +207,7 @@ public class LineTokenizer {
                     }
 
                     // end of check for int and real literals
+
 
                     // check for a terminating symbol or character to recognise an identifier which is a character
                     if ( this.line.charAt(i+1) < 128 && endChar[this.line.charAt(i+1)]) {
@@ -654,7 +655,29 @@ public class LineTokenizer {
 
     } // end of method tokenize
 
+    // artifact from previous method, saved incase needed for future reference
 
+    private int helperCheckForTerm(int index, int addOn, AddToken addToken, StringBuilder sb, TokenLocation tokenLocation) {
+        if (this.line.charAt(index + addOn + 1) < 128 && endChar[this.line.charAt(index + addOn + 1)]) {
+            Token token = new Token(TokenType.identifier, sb.toString(), tokenLocation);
+            addToken.addToLine(token, TokenEnums.identifier);
+            return index + addOn;
+        }
+        return index;
+    }
+
+    // WHAT THIS HELPER FUNCTION DOES AT THE END OF EACH SWITCH BASICALLY
+    // USE LIKE default: { i = this.helperCheckForTerm(i, _, addToken, sb0, tokenLocation) }
+//    default: {
+//
+//        // check for a terminating symbol or character to recognise an identifier which is a character
+//        if ( this.line.charAt(i+3) < 128 && endChar[this.line.charAt(i+3)]) {
+//            Token token = new Token(TokenType.identifier, sb0.toString(), tokenLocation);
+//            addToken.addToLine(token, TokenEnums.identifier);
+//            i += 2;
+//            break;
+//        }
+//    }
 
 
 }
