@@ -60,7 +60,9 @@ public class LineTokenizer {
         keywordStrings.add("NEXT");
         keywordStrings.add("CASE");
         keywordStrings.add("READ");
+        keywordStrings.add("TRUE");
 
+        keywordStrings.add("FALSE");
         keywordStrings.add("ARRAY");
         keywordStrings.add("ENDIF");
         keywordStrings.add("UNTIL");
@@ -447,6 +449,12 @@ public class LineTokenizer {
                     i += 3;
                     break;
                 }
+                case "TRUE": {
+                    Token token = new Token(TokenType.literals, "TRUE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.literalBoolean);
+                    i += 3;
+                    break;
+                }
             } // end of fourth switch
 
 
@@ -457,6 +465,12 @@ public class LineTokenizer {
             char c4 = this.line.charAt(i+4);
             sb0.append(c4);
             switch(sb0.toString()) {
+                case "FALSE": {
+                    Token token = new Token(TokenType.literals, "FALSE", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.literalBoolean);
+                    i += 4;
+                    break;
+                }
                 case "ARRAY": {
                     Token token = new Token(TokenType.keyword, "ARRAY", tokenLocation);
                     addToken.addToLine(token, TokenEnums.typeArray);
