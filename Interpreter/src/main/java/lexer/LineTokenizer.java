@@ -7,15 +7,13 @@ import java.util.Set;
 // use this class by creating a new instance of it then calling tokenize to get the table of tokens
 
 /*future todo when not lazy
-          - create a function or method for every string builder
-          - make a recursive function for identifiers and literals
-          -- could do this by having after the first blank character check to check for future characters and find a " " to stop it and then reoccur the function to find if there are any tokens and then
+          - idk
  */
 
 public class LineTokenizer {
 
-    private String line;
-    private int lineNumber;
+    private final String line;
+    private final int lineNumber;
 
     // apparently this is O(1) lookup so we do it this way
     private static final boolean[] endChar = new boolean[128];
@@ -748,6 +746,7 @@ public class LineTokenizer {
 
     // artifact from previous method, saved incase needed for future reference
 
+    /*
     private int helperCheckForTerm(int index, int addOn, AddToken addToken, StringBuilder sb, TokenLocation tokenLocation) {
         if (this.line.charAt(index + addOn + 1) < 128 && endChar[this.line.charAt(index + addOn + 1)]) {
             Token token = new Token(TokenType.identifier, sb.toString(), tokenLocation);
@@ -755,7 +754,7 @@ public class LineTokenizer {
             return index + addOn;
         }
         return index;
-    }
+    } */
 
     // WHAT THIS HELPER FUNCTION DOES AT THE END OF EACH SWITCH BASICALLY
     // USE LIKE default: { i = this.helperCheckForTerm(i, _, addToken, sb0, tokenLocation) }
