@@ -1,3 +1,8 @@
+// good references
+// https://www.youtube.com/watch?v=0c8b7YfsBKs
+// https://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/
+// https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
+
 package parser;
 
 import java.util.ArrayList;
@@ -25,6 +30,7 @@ public class PrattParser {
             default -> throw new IllegalArgumentException("Unknown operator" + op);
         };
     }
+
 
 
 
