@@ -1,6 +1,6 @@
 package parser;
 
-public class ConditionalExpression implements Expression {
+public class ConditionalExpression {
 
     public ConditionalExpression(Expression condition, Expression thenArm, Expression elseArm) {
         this.condition = condition;

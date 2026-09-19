@@ -1,5 +1,5 @@
 package parser;
 
-public interface Expression {
+public enum Expression {
 
 }
