@@ -1,9 +1,9 @@
 package ast;
 
-public class Program extends Statement{
+public interface Program extends Statement{
 
-    public NodeType kind = NodeType.program;
-    public Statement[] body;
+    NodeType kind = NodeType.program;
+    Statement[] body = null;
 
 }
 

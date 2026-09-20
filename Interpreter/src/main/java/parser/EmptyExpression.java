@@ -1,6 +1,6 @@
 package parser;
 
-public class EmptyExpression extends ast.Expression{
+public class EmptyExpression implements ast.Expression{
 
 
 

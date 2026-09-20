@@ -1,5 +1,5 @@
 package ast;
 
-public class Expression extends Statement {
+public interface Expression extends Statement {
 
 }

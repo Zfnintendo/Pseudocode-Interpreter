@@ -1,9 +1,9 @@
 package ast;
 
-public class Identifier extends Expression{
+public interface Identifier extends Expression{
 
-    public NodeType kind = NodeType.identifier;
-    public String symbol = null;
+    NodeType kind = NodeType.identifier;
+    String symbol = null;
 
 
 }

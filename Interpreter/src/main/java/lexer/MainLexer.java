@@ -29,7 +29,7 @@ public class MainLexer {
         // add end of file token
         AddToken addToken = new AddToken();
         TokenLocation tokenLocation = new TokenLocation(i,0);
-        Token token = new Token(TokenType.control, "", tokenLocation);
+        Token token = new Token(TokenType.control, "EndOfFile", tokenLocation);
 
         addToken.addToLine(token, TokenEnums.eof);
         ArrayList<ArrayList<Object>> endOfFile = addToken.getTokens();

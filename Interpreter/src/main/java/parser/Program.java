@@ -5,7 +5,7 @@ import ast.Statement;
 
 import java.util.ArrayList;
 
-public class Program extends ast.Program {
+public class Program implements ast.Program {
 
     public int size;
 
@@ -13,6 +13,5 @@ public class Program extends ast.Program {
         this.size = size;
     }
 
-    public NodeType kind = NodeType.program;
     public ArrayList<Statement> body = new ArrayList<Statement>();
 }
