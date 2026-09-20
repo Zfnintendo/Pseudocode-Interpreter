@@ -1,8 +1,8 @@
 package ast;
 
-public interface NumericLiteral extends Expression {
+public class NumericLiteral extends Expression {
 
-    NodeType kind = NodeType.numericLiteral;
-    double value = 0;
+    public NodeType kind = NodeType.numericLiteral;
+    public double value = 0;
 
 }

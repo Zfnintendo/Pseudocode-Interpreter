@@ -1,7 +1,7 @@
 package ast;
 
-public interface Statement {
+public class Statement {
 
-    NodeType kind = null;
+    public NodeType kind;
 
 }
