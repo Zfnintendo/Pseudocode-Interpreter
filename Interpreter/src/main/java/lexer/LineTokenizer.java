@@ -107,40 +107,8 @@ public class LineTokenizer {
         this.lineNumber = lineNumber;
     }
 
-    public static boolean startsWithTab(String str) {
-        if (str == null || str.isEmpty()) {
-            return false;
-        }
-        // (char) 9 represents the horizontal tab character
-        return str.charAt(0) == (char) 9;
-    }
-
-    public static int countTabs(String str) {
-        if (str == null || str.isEmpty()) {
-            return 0;
-        }
-
-        int count = 0;
-        // Loop through the string until a non-tab character is found
-        while (count < str.length() && str.charAt(count) == (char) 9) {
-            count++;
-        }
-
-        return count;
-    }
-
-
     public ArrayList<ArrayList<Object>> tokenize() {
         AddToken addToken = new AddToken();
-
-        if (startsWithTab(this.line)) {
-            int tabAmount = countTabs(this.line);
-            for (int j = 0; j < tabAmount; j++) {
-                TokenLocation tokenLoc = new TokenLocation(this.lineNumber, j);
-                Token token = new Token(TokenType.control, "\t", tokenLoc);
-                addToken.addToLine(token, TokenEnums.tab);
-            }
-        }
 
         for (int i = 0; i < this.line.length(); i++) {
             TokenLocation tokenLocation = new TokenLocation(this.lineNumber, i);
@@ -329,6 +297,7 @@ public class LineTokenizer {
 //                        addToken.addToLine(token, TokenEnums.identifier);
 //                        break;
 //                    }
+                    // redundant ^^^
 
                     // check for keywords and if the word is not a keyword then register as an identifier
                     int j = i;
