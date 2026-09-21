@@ -16,6 +16,7 @@ import lexer.TokenType;
 import lexer.Token;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 public class MainParser {
 
@@ -40,7 +41,15 @@ public class MainParser {
         return token;
     }
 
+    private ArrayList<Object> expect(TokenEnums tokenType, String err) {
+        ArrayList<Object> token = this.tokens.removeFirst();
+        TokenEnums temp = (TokenEnums) token.get(1);
+        if ( temp != tokenType ) {
+            throw new NoSuchElementException(err + "| Got: " + token + "| Expected: " + tokenType);
+        }
 
+        return token;
+    }
 
     public Program produceAST(ArrayList<ArrayList<Object>> lexedFile) {
 
@@ -68,11 +77,27 @@ public class MainParser {
     }
 
     private ast.Expression parseAdditiveExpression() {
-        ast.Expression left = this.parsePrimaryExpression();
+        ast.Expression left = this.parseMultiplicativeExpression();
 
         String tkValue = ((Token)this.at().getFirst()).getValue(); // gets token value at
 
         while ( tkValue == "+" || tkValue == "-" ) {
+            final String operator = ((Token)this.eat().getFirst()).getValue();
+            final ast.Expression right = this.parseMultiplicativeExpression();
+
+            left = new BinaryExpression(left, right, operator);
+
+        }
+
+        return left;
+    }
+
+    private ast.Expression parseMultiplicativeExpression() {
+        ast.Expression left = this.parsePrimaryExpression();
+
+        String tkValue = ((Token)this.at().getFirst()).getValue();
+
+        while ( tkValue == "*" || tkValue == "/" || tkValue == "MOD" || tkValue == "DIV") {
             final String operator = ((Token)this.eat().getFirst()).getValue();
             final ast.Expression right = this.parsePrimaryExpression();
 
@@ -81,7 +106,6 @@ public class MainParser {
         }
 
         return left;
-
     }
 
     private ast.Expression parsePrimaryExpression() {
@@ -96,6 +120,12 @@ public class MainParser {
             }
             case TokenEnums.literalInteger, TokenEnums.literalReal: {
                 return new NumericLiteral(tkValue);
+            }
+            case TokenEnums.leftParen: {
+                this.eat();
+                final ast.Expression value = this.parseExpression();
+                this.expect(TokenEnums.rightParen, "Unexpected token found inside parenthesised expression. Expected closing parenthesis.");
+                return value;
             }
             default: {
                 throw new UnknownError("Unexpected token found during parsing!");
