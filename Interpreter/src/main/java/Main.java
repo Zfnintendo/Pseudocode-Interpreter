@@ -11,9 +11,10 @@ public class Main {
         System.out.println("Pseudocode Interpreter made by Zeftarium!");
 
         /* todo
-            - make a lexer CHECK ALMOST
+            - make a lexer CHECK
             - make a parser ?
             - make the interpreter
+            - WORK ON README FOR DOCUMENTATION PURPOSES!
          */
 
         // start of main
