@@ -116,4 +116,5 @@ public enum TokenEnums {
     // other tokens
     eol, // end of line token
     eof, // end of file token
+    tab, // \t token
 }

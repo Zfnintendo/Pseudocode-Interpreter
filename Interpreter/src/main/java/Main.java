@@ -11,7 +11,7 @@ public class Main {
         System.out.println("Pseudocode Interpreter made by Zeftarium!");
 
         /* todo
-            - make a lexer CHECK
+            - make a lexer CHECK ALMOST
             - make a parser ?
             - make the interpreter
          */
@@ -30,6 +30,8 @@ public class Main {
             // lexer
             MainLexer mainLexer = new MainLexer(file);
             ArrayList<ArrayList<Object>> lexedFile = mainLexer.lexFile();
+
+            System.out.println(lexedFile);
 
             // parser
 

@@ -23,6 +23,8 @@ public class MainParser {
     public Program program;
     public ast.Statement statement;
 
+
+
     private boolean notEOF() {
         return this.tokens.getFirst().get(1) != TokenEnums.eof;
     }
@@ -36,6 +38,8 @@ public class MainParser {
         this.tokens.removeFirst();
         return this.tokens;
     }
+
+
 
     public Program produceAST(ArrayList<ArrayList<Object>> lexedFile) {
 
@@ -77,7 +81,6 @@ public class MainParser {
             }
             default: {
                 throw new UnknownError("Unexpected token found during parsing!");
-                return new EmptyExpression();
             }
         }
 

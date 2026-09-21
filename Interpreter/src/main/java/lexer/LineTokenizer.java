@@ -35,6 +35,7 @@ public class LineTokenizer {
         endChar[']'] = true;
         endChar[':'] = true;
         endChar[','] = true;
+        endChar['\t'] = true;
 
         keywordStrings.add("<-");
         keywordStrings.add("OR");
@@ -106,11 +107,44 @@ public class LineTokenizer {
         this.lineNumber = lineNumber;
     }
 
+    public static boolean startsWithTab(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        // (char) 9 represents the horizontal tab character
+        return str.charAt(0) == (char) 9;
+    }
+
+    public static int countTabs(String str) {
+        if (str == null || str.isEmpty()) {
+            return 0;
+        }
+
+        int count = 0;
+        // Loop through the string until a non-tab character is found
+        while (count < str.length() && str.charAt(count) == (char) 9) {
+            count++;
+        }
+
+        return count;
+    }
+
+
     public ArrayList<ArrayList<Object>> tokenize() {
         AddToken addToken = new AddToken();
 
+        if (startsWithTab(this.line)) {
+            int tabAmount = countTabs(this.line);
+            for (int j = 0; j < tabAmount; j++) {
+                TokenLocation tokenLoc = new TokenLocation(this.lineNumber, j);
+                Token token = new Token(TokenType.control, "\t", tokenLoc);
+                addToken.addToLine(token, TokenEnums.tab);
+            }
+        }
+
         for (int i = 0; i < this.line.length(); i++) {
             TokenLocation tokenLocation = new TokenLocation(this.lineNumber, i);
+
 
             char c0 = this.line.charAt(i);
             switch(c0) { // check for symbol tokens or 1 character tokens | ONE CHARACTER STARTS HERE!
@@ -185,7 +219,7 @@ public class LineTokenizer {
                     // build string literal
                     StringBuilder sb = new StringBuilder();
                     i++;
-
+                    tokenLocation.changeColumn(i);
                     while ( this.line.charAt(i) != '"' ) {
 
                         sb.append(this.line.charAt(i));
@@ -194,9 +228,14 @@ public class LineTokenizer {
                         if (i >= this.line.length()) { break; }// replace with throw error message later as this is when its longer than the line therefore error
                     }
 
-                    tokenLocation.changeColumn(i);
                     Token stringLiteralToken = new Token(TokenType.literals, sb.toString(), tokenLocation);
                     addToken.addToLine(stringLiteralToken, TokenEnums.literalString);
+
+                    tokenLocation.changeColumn(i);
+                    Token endQuotations = new Token(TokenType.punctuation, String.valueOf(this.line.charAt(i)), tokenLocation);
+                    addToken.addToLine(endQuotations, TokenEnums.doubleQuote);
+
+
 
                     break;
                 }
@@ -212,6 +251,13 @@ public class LineTokenizer {
 
                     Token charLiteralToken = new Token(TokenType.literals, String.valueOf(this.line.charAt(i)), tokenLocation);
                     addToken.addToLine(charLiteralToken, TokenEnums.literalChar);
+
+                    i++;
+
+                    tokenLocation.changeColumn(i);
+
+                    Token endQuote = new Token(TokenType.punctuation, "'", tokenLocation);
+                    addToken.addToLine(endQuote, TokenEnums.singleQuote);
 
                     break;
                 }
@@ -245,16 +291,22 @@ public class LineTokenizer {
                         sb.append(this.line.charAt(i));
                         i++;
                         isInt = true;
+
+                        if (i == this.line.length()) { break; }
                     }
+
+                    if (i == this.line.length()) { break; }
 
                     if (this.line.charAt(i) == '.') {
                         i++;
                         while ( Character.isDigit(this.line.charAt(i)) ) {
                             sb.append(this.line.charAt(i));
                             i++;
+                            if (i == this.line.length()) { break; }
                         }
                         isInt = false;
                         isReal = true;
+
                     }
 
                     if (isInt) {
@@ -270,6 +322,8 @@ public class LineTokenizer {
                     // end of check for int and real literals
 
 
+                    if (i + 1 >= this.line.length()) { continue; }
+
                     // check for a terminating symbol or character to recognise an identifier which is a character
                     if ( this.line.charAt(i+1) < 128 && endChar[this.line.charAt(i+1)]) {
                         Token token = new Token(TokenType.identifier, String.valueOf(this.line.charAt(i)), tokenLocation);
@@ -279,9 +333,11 @@ public class LineTokenizer {
 
                     // check for keywords and if the word is not a keyword then register as an identifier
                     int j = i;
-                    while ( !Character.isDigit(this.line.charAt(j)) && endChar[this.line.charAt(j)] ) {
+                    while ( !endChar[this.line.charAt(j)] ) {
                         sb.append(this.line.charAt(j));
                         j++;
+
+                        if (j == this.line.length()) { break; }
                     }
 
 

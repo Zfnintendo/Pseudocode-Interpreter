@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class MainLexer {
 
     private final File file;
-    private ArrayList<ArrayList<Object>> lexedLine;
+    private ArrayList<ArrayList<Object>> lexedLine = new ArrayList<>();
 
     public MainLexer(File file) {
         this.file = file;
@@ -18,7 +18,7 @@ public class MainLexer {
 
         Scanner scanner = new Scanner(this.file);
 
-        int i = 1;
+        int i = 0;
         while (scanner.hasNextLine()) {
             LineTokenizer lineTokenizer = new LineTokenizer(scanner.nextLine(), i);
             this.lexedLine.addAll( lineTokenizer.tokenize() ); // adding it to the lexedLine the line that we lexed!
