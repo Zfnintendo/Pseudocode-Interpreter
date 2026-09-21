@@ -295,11 +295,12 @@ public class LineTokenizer {
                         if (i == this.line.length()) { break; }
                     }
 
-                    if (i == this.line.length()) { break; }
+//                    if (i == this.line.length()) { break; }
 
-                    if (this.line.charAt(i) == '.') {
+                    if (i < this.line.length() && this.line.charAt(i) == '.') {
+                        sb.append('.');
                         i++;
-                        while ( Character.isDigit(this.line.charAt(i)) ) {
+                        while ( i < this.line.length() && Character.isDigit(this.line.charAt(i)) ) {
                             sb.append(this.line.charAt(i));
                             i++;
                             if (i == this.line.length()) { break; }
