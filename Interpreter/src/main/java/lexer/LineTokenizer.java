@@ -322,14 +322,12 @@ public class LineTokenizer {
                     // end of check for int and real literals
 
 
-                    if (i + 1 >= this.line.length()) { continue; }
-
                     // check for a terminating symbol or character to recognise an identifier which is a character
-                    if ( this.line.charAt(i+1) < 128 && endChar[this.line.charAt(i+1)]) {
-                        Token token = new Token(TokenType.identifier, String.valueOf(this.line.charAt(i)), tokenLocation);
-                        addToken.addToLine(token, TokenEnums.identifier);
-                        break;
-                    }
+//                    if ( this.line.charAt(i+1) < 128 && endChar[this.line.charAt(i+1)]) {
+//                        Token token = new Token(TokenType.identifier, String.valueOf(this.line.charAt(i)), tokenLocation);
+//                        addToken.addToLine(token, TokenEnums.identifier);
+//                        break;
+//                    }
 
                     // check for keywords and if the word is not a keyword then register as an identifier
                     int j = i;
@@ -344,7 +342,7 @@ public class LineTokenizer {
                     if ( !keywordStrings.contains( sb.toString() ) ) {
                         Token token = new Token(TokenType.identifier, sb.toString(), tokenLocation);
                         addToken.addToLine(token, TokenEnums.identifier);
-                        i = j;
+                        i = j - 1;
                         break;
                     }
                     // end for check
