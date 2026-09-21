@@ -1,9 +1,14 @@
 package ast;
 
+import java.util.ArrayList;
+
 public interface Program extends Statement{
 
-    NodeType kind = NodeType.program;
-    Statement[] body = null;
+
+    ArrayList<Statement> body();
+
+    @Override
+    NodeType kind();
 
 }
 

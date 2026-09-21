@@ -2,10 +2,11 @@ package ast;
 
 public interface BinaryExpression extends Expression {
 
-    NodeType kind = NodeType.binaryExpression;
+    @Override
+    NodeType kind(); // binaryExpression
 
-    Expression LHS = null;
-    Expression RHS = null;
-    String operator = null;
+    Expression LHS();
+    Expression RHS();
+    String operator();
 
 }

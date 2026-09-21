@@ -2,7 +2,9 @@ package ast;
 
 public interface NumericLiteral extends Expression {
 
-    NodeType kind = NodeType.numericLiteral;
-    String value = null;
+    @Override
+    NodeType kind(); // NumericLiteral
+
+    String value();
 
 }

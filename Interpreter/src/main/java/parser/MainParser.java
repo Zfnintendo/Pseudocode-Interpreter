@@ -34,9 +34,10 @@ public class MainParser {
         return this.tokens.getFirst();
     }
 
-    private ArrayList<ArrayList<Object>> eat() {
-        this.tokens.removeFirst();
-        return this.tokens;
+    // returns the first token after eating
+    private ArrayList<Object> eat() {
+        ArrayList<Object> token = this.tokens.removeFirst();
+        return token;
     }
 
 
@@ -48,7 +49,7 @@ public class MainParser {
 
         // parse until end of file
         while (this.notEOF()) {
-            this.program.body.add(this.parseStatement());
+            this.program.body().add(this.parseStatement());
         }
 
         return null;
@@ -63,14 +64,31 @@ public class MainParser {
     }
 
     private ast.Expression parseExpression() {
-        return this.parsePrimaryExpression();
+        return this.parseAdditiveExpression();
+    }
+
+    private ast.Expression parseAdditiveExpression() {
+        ast.Expression left = this.parsePrimaryExpression();
+
+        String tkValue = ((Token)this.at().getFirst()).getValue(); // gets token value at
+
+        while ( tkValue == "+" || tkValue == "-" ) {
+            final String operator = ((Token)this.eat().getFirst()).getValue();
+            final ast.Expression right = this.parsePrimaryExpression();
+
+            left = new BinaryExpression(left, right, operator);
+
+        }
+
+        return left;
+
     }
 
     private ast.Expression parsePrimaryExpression() {
 
         ArrayList<Object> tk = this.at();
         TokenEnums tkType = ( (TokenEnums) tk.get(1));
-        String tkValue = ((Token)this.eat().getFirst().getFirst()).getValue(); // gets token value
+        String tkValue = ((Token)this.eat().getFirst()).getValue(); // gets the eaten value
 
         switch(tkType) {
             case TokenEnums.identifier: {

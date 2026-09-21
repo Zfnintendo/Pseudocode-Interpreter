@@ -13,5 +13,13 @@ public class Program implements ast.Program {
         this.size = size;
     }
 
-    public ArrayList<Statement> body = new ArrayList<Statement>();
+    @Override
+    public NodeType kind() {
+        return NodeType.program;
+    }
+
+    @Override
+    public ArrayList<Statement> body() {
+        return new ArrayList<Statement>();
+    }
 }
