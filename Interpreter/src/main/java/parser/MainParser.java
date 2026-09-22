@@ -22,9 +22,6 @@ public class MainParser {
 
     private ArrayList<ArrayList<Object>> tokens = new ArrayList<ArrayList<Object>>();
     public Program program;
-    public ast.Statement statement;
-
-
 
     private boolean notEOF() {
         return this.tokens.getFirst().get(1) != TokenEnums.eof;
@@ -61,7 +58,7 @@ public class MainParser {
             this.program.body().add(this.parseStatement());
         }
 
-        return null;
+        return this.program;
 
 
     }

@@ -29,3 +29,10 @@ Scanner scanner = new Scanner(this.file);
 ```
 As seen in this code as shown above ^ this simply creates a scanner instance and has that scanner iterate line by
 line and tokenize each line then adding it to an Arraylist where it stores the token objects.
+
+### LineTokenizer.java
+
+This java class does most of the work in the lexer package as it is what converts and adds the tokens for each
+line. It basically just searches for any single character tokens then looks for a literal or identifier then
+matches any other tokens it finds to a token and adds that to the list. It does this for each line which is then
+all summed up and added to one big list later on in MainLexer.java.
