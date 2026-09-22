@@ -36,3 +36,16 @@ This java class does most of the work in the lexer package as it is what convert
 line. It basically just searches for any single character tokens then looks for a literal or identifier then
 matches any other tokens it finds to a token and adds that to the list. It does this for each line which is then
 all summed up and added to one big list later on in MainLexer.java.
+
+Each unique non identifier token is created by using a switch statement in which it matches the correct keywords
+to the correct tokens. Here is an example of what this would look like;
+
+```
+switch(stringA) { // checks for two character tokens
+                case "<-": {
+                    Token token = new Token(TokenType.operator, "<-", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.assignment);
+                    i++; // we skip the next iteration as thats basically the same token
+                    break;
+                }
+```
