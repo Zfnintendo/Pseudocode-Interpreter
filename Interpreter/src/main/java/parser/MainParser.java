@@ -87,9 +87,35 @@ public class MainParser {
         return switch(this.currentType()) {
             case TokenEnums.declare -> this.parseVariableDeclaration();
             case TokenEnums.identifier -> this.parseAssignment();
+            case TokenEnums.output -> this.parseOutput();
+            case TokenEnums.input -> this.parseInput();
 
             default -> throw new IllegalArgumentException("Expected a statement, got: " + this.currentType());
         };
+    }
+
+    private ast.Input parseInput() {
+        this.expect(TokenEnums.input, "Expected INPUT");
+
+        ArrayList<Object> tokenObject = this.expect(TokenEnums.identifier, "Expected a variable name.");
+        String name = ((Token) tokenObject.getFirst()).getValue();
+
+        return new Input(new Identifier(name));
+    }
+
+    private ast.Output parseOutput() {
+        this.expect(TokenEnums.output, "Expected OUTPUT.");
+
+        ArrayList<ast.Expression> values = new ArrayList<>();
+
+        values.add(this.parseExpression());
+
+        while (this.currentType() == TokenEnums.comma || this.currentType() == TokenEnums.concatenate) {
+            this.eat();
+            values.add(this.parseExpression());
+        }
+
+        return new Output(values);
     }
 
     private ast.VariableDeclaration parseVariableDeclaration() {
@@ -130,6 +156,7 @@ public class MainParser {
     }
 
 
+    // expressions start here
     private ast.Expression parseExpression() {
         return this.parseAdditiveExpression();
     }

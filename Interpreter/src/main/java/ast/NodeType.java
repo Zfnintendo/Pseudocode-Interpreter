@@ -10,4 +10,6 @@ public enum NodeType {
     functionDeclaration,
     variableDeclaration,
     assignment,
+    output,
+    input,
 }
