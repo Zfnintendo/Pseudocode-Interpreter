@@ -38,6 +38,7 @@ public class MainParser {
         return token;
     }
 
+    // eats the token and checks for the type if not expected then return error
     private ArrayList<Object> expect(TokenEnums tokenType, String err) {
         ArrayList<Object> token = this.tokens.removeFirst();
         TokenEnums temp = (TokenEnums) token.get(1);
@@ -83,11 +84,50 @@ public class MainParser {
     }
 
     private ast.Statement parseStatement() {
-        // skip to parse expression
+        return switch(this.currentType()) {
+            case TokenEnums.declare -> this.parseVariableDeclaration();
+            case TokenEnums.identifier -> this.parseAssignment();
 
-        return this.parseExpression();
+            default -> throw new IllegalArgumentException("Expected a statement, got: " + this.currentType());
+        };
     }
 
+    private ast.VariableDeclaration parseVariableDeclaration() {
+        this.expect(TokenEnums.declare, "Expected DECLARE.");
+
+        ArrayList<Object> tokenObject = this.expect(TokenEnums.identifier, "Expected variable name after DECLARE.");
+
+        String name = ((Token) tokenObject.getFirst()).getValue();
+
+        this.expect(TokenEnums.colon, "Expected ':' after variable name.");
+
+        TokenEnums type = this.currentType();
+
+        switch (type) {
+            case TokenEnums.typeInteger, TokenEnums.typeReal, TokenEnums.typeChar, TokenEnums.typeString, TokenEnums.typeBoolean: {
+                this.eat();
+                break;
+            }
+            default: {
+                throw new IllegalArgumentException("Expected data type after ':', got: " + type);
+            }
+
+        }
+
+        return new VariableDeclaration(name, type);
+    }
+
+    private ast.Assignment parseAssignment() {
+        ArrayList<Object> tokenObject = this.expect(TokenEnums.identifier, "Expected assignment variable.");
+
+        String name = ((Token) tokenObject.getFirst()).getValue();
+
+        this.expect(TokenEnums.assignment, "Expected '<-' after assignment variable");
+
+        ast.Expression value = this.parseExpression();
+
+        return new Assignment(new Identifier(name), value);
+    }
 
 
     private ast.Expression parseExpression() {
