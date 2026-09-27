@@ -52,6 +52,10 @@ public class MainParser {
         return ((Token) this.at().getFirst()).getValue();
     }
 
+    private TokenEnums currentType() {
+        return (TokenEnums) this.at().get(1);
+    }
+
     public Program produceAST(ArrayList<ArrayList<Object>> lexedFile) {
 
         this.tokens = lexedFile;
@@ -83,6 +87,8 @@ public class MainParser {
 
         return this.parseExpression();
     }
+
+
 
     private ast.Expression parseExpression() {
         return this.parseAdditiveExpression();

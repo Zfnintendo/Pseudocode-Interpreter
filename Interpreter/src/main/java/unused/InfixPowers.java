@@ -1,4 +1,4 @@
-package parser;
+package unused;
 
 public class InfixPowers {
 

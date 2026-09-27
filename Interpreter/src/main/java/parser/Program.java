@@ -18,8 +18,10 @@ public class Program implements ast.Program {
         return NodeType.program;
     }
 
+    private final ArrayList<Statement> statements = new ArrayList<>();
+
     @Override
     public ArrayList<Statement> body() {
-        return new ArrayList<Statement>();
+        return this.statements;
     }
 }

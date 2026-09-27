@@ -8,4 +8,6 @@ public enum NodeType {
     callExpression,
     unaryExpression,
     functionDeclaration,
+    variableDeclaration,
+    assignment,
 }
