@@ -1,7 +1,5 @@
 // ref https://youtu.be/aAvL2BTHf60?si=CxFZhF8YefAWDy3R
 
-// goddamn i really messed up my intial structure now bear the pain with spagetti code
-
 // reminder on what all these things do oh my god
 // tokens.get() gets i tokenObject in the list
 // tokens.removeFirst() removes the first thing in the list and shifts
@@ -107,10 +105,9 @@ public class MainParser {
         this.expect(TokenEnums.output, "Expected OUTPUT.");
 
         ArrayList<ast.Expression> values = new ArrayList<>();
-
         values.add(this.parseExpression());
 
-        while (this.currentType() == TokenEnums.comma || this.currentType() == TokenEnums.concatenate) {
+        while (this.currentType() == TokenEnums.comma) {
             this.eat();
             values.add(this.parseExpression());
         }
@@ -158,7 +155,21 @@ public class MainParser {
 
     // expressions start here
     private ast.Expression parseExpression() {
-        return this.parseAdditiveExpression();
+        return this.parseConcatenationExpression();
+    }
+
+    private ast.Expression parseConcatenationExpression() {
+        ast.Expression left = this.parseAdditiveExpression();
+
+        while (this.currentType() == TokenEnums.concatenate) {
+            String operator = ((Token) this.eat().getFirst()).getValue();
+
+            ast.Expression right = this.parseAdditiveExpression();
+
+            left = new BinaryExpression(left, right, operator);
+        }
+
+        return left;
     }
 
     private ast.Expression parseAdditiveExpression() {
@@ -209,6 +220,33 @@ public class MainParser {
             }
             case TokenEnums.literalInteger, TokenEnums.literalReal: {
                 return new NumericLiteral(tkValue);
+            }
+            case TokenEnums.doubleQuote: {
+                ArrayList<Object> tokenObject = this.expect(TokenEnums.literalString, "Expected string literal after opening quote.");
+
+                String value = ((Token) tokenObject.getFirst()).getValue();
+
+                this.expect(TokenEnums.doubleQuote, "Expected closing quotations.");
+
+                return new TextLiteral(value);
+            }
+            case TokenEnums.singleQuote: {
+                ArrayList<Object> tokenObject = this.expect(TokenEnums.literalChar, "Expected character literal after opening quote.");
+
+                String value = ((Token) tokenObject.getFirst()).getValue();
+
+                if (value.length() != 1) { throw new IllegalArgumentException("Character literal can only contain one character."); }
+
+                this.expect(TokenEnums.singleQuote, "Expected closing quote after character literal.");
+
+                return new TextLiteral(value);
+            }
+            case TokenEnums.literalBoolean: {
+                return switch (tkValue) {
+                    case "TRUE" -> new BooleanLiteral(true);
+                    case "FALSE" -> new BooleanLiteral(false);
+                    default -> throw new IllegalArgumentException("Invalid boolean literal: " + tkValue);
+                };
             }
             case TokenEnums.leftParen: {
                 final ast.Expression value = this.parseExpression();

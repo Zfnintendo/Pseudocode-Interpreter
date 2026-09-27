@@ -3,6 +3,8 @@ package ast;
 public enum NodeType {
     program,
     numericLiteral,
+    textLiteral,
+    booleanLiteral,
     identifier,
     binaryExpression,
     callExpression,
