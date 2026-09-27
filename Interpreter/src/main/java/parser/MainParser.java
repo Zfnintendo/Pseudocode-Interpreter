@@ -48,6 +48,10 @@ public class MainParser {
         return token;
     }
 
+    private String currentValue() {
+        return ((Token) this.at().getFirst()).getValue();
+    }
+
     public Program produceAST(ArrayList<ArrayList<Object>> lexedFile) {
 
         this.tokens = lexedFile;
@@ -55,7 +59,18 @@ public class MainParser {
 
         // parse until end of file
         while (this.notEOF()) {
+            // Skip blank lines or the newline after a statement.
+            if (this.at().get(1) == TokenEnums.eol) {
+                this.eat();
+                continue;
+            }
+
             this.program.body().add(this.parseStatement());
+
+            // A complete statement must end at a newline or EOF.
+            if (this.at().get(1) != TokenEnums.eol && this.at().get(1) != TokenEnums.eof) {
+                throw new IllegalArgumentException("Expected end of line after statement, got: " + this.at());
+            }
         }
 
         return this.program;
@@ -76,13 +91,15 @@ public class MainParser {
     private ast.Expression parseAdditiveExpression() {
         ast.Expression left = this.parseMultiplicativeExpression();
 
-        String tkValue = ((Token)this.at().getFirst()).getValue(); // gets token value at
+        String tkValue = this.currentValue(); // gets token value at
 
-        while ( tkValue == "+" || tkValue == "-" ) {
-            final String operator = ((Token)this.eat().getFirst()).getValue();
-            final ast.Expression right = this.parseMultiplicativeExpression();
+        while ( tkValue.equals("+") || tkValue.equals("-") ){
+            String operator = ((Token)this.eat().getFirst()).getValue();
+            ast.Expression right = this.parseMultiplicativeExpression();
 
             left = new BinaryExpression(left, right, operator);
+
+            tkValue = this.currentValue();
 
         }
 
@@ -92,13 +109,15 @@ public class MainParser {
     private ast.Expression parseMultiplicativeExpression() {
         ast.Expression left = this.parsePrimaryExpression();
 
-        String tkValue = ((Token)this.at().getFirst()).getValue();
+        String tkValue = this.currentValue();
 
-        while ( tkValue == "*" || tkValue == "/" || tkValue == "MOD" || tkValue == "DIV") {
+        while ( tkValue.equals("*") || tkValue.equals("/") || tkValue.equals("MOD") ||tkValue.equals("DIV") ) {
             final String operator = ((Token)this.eat().getFirst()).getValue();
             final ast.Expression right = this.parsePrimaryExpression();
 
             left = new BinaryExpression(left, right, operator);
+
+            tkValue = this.currentValue();
 
         }
 
@@ -119,7 +138,6 @@ public class MainParser {
                 return new NumericLiteral(tkValue);
             }
             case TokenEnums.leftParen: {
-                this.eat();
                 final ast.Expression value = this.parseExpression();
                 this.expect(TokenEnums.rightParen, "Unexpected token found inside parenthesised expression. Expected closing parenthesis.");
                 return value;
