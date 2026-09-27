@@ -239,6 +239,11 @@ public class LineTokenizer {
                     addToken.addToLine(token, TokenEnums.colon);
                     break;
                 }
+                case '&': {
+                    Token token = new Token(TokenType.punctuation, "&", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.concatenate);
+                    break;
+                }
                 default: {/*
                     "I assume keywords are a subset of identifiers.
 

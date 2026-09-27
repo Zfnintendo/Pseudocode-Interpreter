@@ -68,6 +68,7 @@ public enum TokenEnums {
     doubleQuote, // "
     singleQuote, // '
     comma, // ,
+    concatenate, // &
 
     // statements
     declare,
