@@ -7,4 +7,6 @@ public interface TextLiteral extends Expression {
 
     String value();
 
+    TextType type();
+
 }

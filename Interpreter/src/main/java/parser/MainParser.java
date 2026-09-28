@@ -240,7 +240,7 @@ public class MainParser {
 
                 this.expect(TokenEnums.doubleQuote, "Expected closing quotations.");
 
-                return new TextLiteral(value);
+                return new TextLiteral(value, ast.TextType.string);
             }
             case TokenEnums.singleQuote: {
                 ArrayList<Object> tokenObject = this.expect(TokenEnums.literalChar, "Expected character literal after opening quote.");
@@ -251,7 +251,7 @@ public class MainParser {
 
                 this.expect(TokenEnums.singleQuote, "Expected closing quote after character literal.");
 
-                return new TextLiteral(value);
+                return new TextLiteral(value, ast.TextType.character);
             }
             case TokenEnums.literalBoolean: {
                 return switch (tkValue) {
