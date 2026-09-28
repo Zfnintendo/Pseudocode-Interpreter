@@ -136,6 +136,42 @@ public class MainParser {
         return new RepeatStatement(body, condition);
     }
 
+    private ast.ForStatement parseForStatement() {
+        this.expect(TokenEnums.tokenFor, "Expected FOR");
+
+        ArrayList<Object> variableObject = this.expect(TokenEnums.identifier, "Expected an identifier after FOR.");
+
+        String variableName = ((Token) variableObject.getFirst()).getValue();
+
+        this.expect(TokenEnums.assignment, "Expected '<-' after FOR variable.");
+
+        ast.Expression start = this.parseExpression();
+
+        this.expect(TokenEnums.tokenTo, "Expected TO after inital value.");
+
+        ast.Expression end = this.parseExpression();
+        ast.Expression step = new NumericLiteral("1");
+
+        if (this.currentType() == TokenEnums.step) {
+            this.eat();
+            step = this.parseExpression();
+        }
+
+        this.expect(TokenEnums.eol, "Expected a new line after FOR statement.");
+
+        ArrayList<ast.Statement> body = this.parseBlock(Set.of(TokenEnums.next));
+
+        this.expect(TokenEnums.next, "Expected NEXT.");
+
+        ArrayList<Object> closingToken = this.expect(TokenEnums.identifier, "Expected FOR loop variable after NEXT");
+
+        String closingName = ((Token) closingToken.getFirst()).getValue();
+
+        if (!variableName.equals(closingName)) { throw new IllegalArgumentException("Expected NEXT " + variableName + ", got NEXT " + closingName); }
+
+        return new ForStatement(new Identifier(variableName), start, end, step, body);
+    }
+
     private ArrayList<ast.Statement> parseBlock(Set<TokenEnums> endingToken) {
         ArrayList<ast.Statement> body = new ArrayList<>();
 
