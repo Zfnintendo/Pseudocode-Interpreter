@@ -191,13 +191,13 @@ public class MainParser {
     }
 
     private ast.Expression parseMultiplicativeExpression() {
-        ast.Expression left = this.parsePrimaryExpression();
+        ast.Expression left = this.parseUnaryExpression();
 
         String tkValue = this.currentValue();
 
         while ( tkValue.equals("*") || tkValue.equals("/") || tkValue.equals("MOD") ||tkValue.equals("DIV") ) {
             final String operator = ((Token)this.eat().getFirst()).getValue();
-            final ast.Expression right = this.parsePrimaryExpression();
+            final ast.Expression right = this.parseUnaryExpression();
 
             left = new BinaryExpression(left, right, operator);
 
@@ -206,6 +206,18 @@ public class MainParser {
         }
 
         return left;
+    }
+
+    private ast.Expression parseUnaryExpression() {
+        if (this.currentType() == TokenEnums.subtraction) {
+            String operator = ((Token) this.eat().getFirst()).getValue();
+
+            ast.Expression operand = this.parseUnaryExpression();
+
+            return new UnaryExpression(operator, operand);
+        }
+
+        return this.parsePrimaryExpression();
     }
 
     private ast.Expression parsePrimaryExpression() {
