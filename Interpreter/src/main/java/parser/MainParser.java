@@ -55,6 +55,14 @@ public class MainParser {
         return (TokenEnums) this.at().get(1);
     }
 
+    private boolean isComparisonOperator() {
+        return switch (this.currentType()) {
+            case TokenEnums.equals, TokenEnums.notEqualTo, TokenEnums.lessThan, TokenEnums.greaterThan,
+                 TokenEnums.lessEqualTo, TokenEnums.greaterEqualTo -> true;
+            default -> false;
+        };
+    }
+
     public Program produceAST(ArrayList<ArrayList<Object>> lexedFile) {
 
         this.tokens = lexedFile;
@@ -77,8 +85,6 @@ public class MainParser {
         }
 
         return this.program;
-
-
     }
 
     private ast.Statement parseStatement() {
@@ -156,6 +162,23 @@ public class MainParser {
     // expressions start here
     private ast.Expression parseExpression() {
         return this.parseConcatenationExpression();
+    }
+
+    private ast.Expression parseComparisonExpression() {
+        ast.Expression left = this.parseConcatenationExpression();
+
+        if (this.isComparisonOperator()) {
+            String operator = ((Token) this.eat().getFirst()).getValue();
+            ast.Expression right = this.parseConcatenationExpression();
+
+            left = new BinaryExpression(left, right, operator);
+
+            if (this.isComparisonOperator()) {
+                throw new IllegalArgumentException("Comparison operators can not be used in a row.");
+            }
+        }
+
+        return left;
     }
 
     private ast.Expression parseConcatenationExpression() {
