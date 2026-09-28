@@ -35,7 +35,7 @@ public class LineTokenizer {
         endChar[']'] = true;
         endChar[':'] = true;
         endChar[','] = true;
-        endChar['\t'] = true;
+        endChar['&'] = true;
 
         keywordStrings.add("<-");
         keywordStrings.add("OR");
@@ -44,6 +44,7 @@ public class LineTokenizer {
         keywordStrings.add("<>");
         keywordStrings.add("OF");
         keywordStrings.add("IF");
+        keywordStrings.add("TO");
 
         keywordStrings.add("AND");
         keywordStrings.add("DIV");
@@ -60,6 +61,7 @@ public class LineTokenizer {
         keywordStrings.add("CASE");
         keywordStrings.add("READ");
         keywordStrings.add("TRUE");
+        keywordStrings.add("STEP");
 
         keywordStrings.add("FALSE");
         keywordStrings.add("ARRAY");
@@ -377,6 +379,12 @@ public class LineTokenizer {
                     i++;
                     break;
                 }
+                case "TO": {
+                    Token token = new Token(TokenType.keyword, "TO", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.tokenTo);
+                    i++;
+                    break;
+                }
             } // end of second switch
 
 
@@ -479,6 +487,12 @@ public class LineTokenizer {
                 case "TRUE": {
                     Token token = new Token(TokenType.literals, "TRUE", tokenLocation);
                     addToken.addToLine(token, TokenEnums.literalBoolean);
+                    i += 3;
+                    break;
+                }
+                case "STEP": {
+                    Token token = new Token(TokenType.keyword, "STEP", tokenLocation);
+                    addToken.addToLine(token, TokenEnums.step);
                     i += 3;
                     break;
                 }

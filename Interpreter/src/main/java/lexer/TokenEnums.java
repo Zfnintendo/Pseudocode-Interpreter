@@ -87,6 +87,8 @@ public enum TokenEnums {
     endWhile,
     //  for loop
     tokenFor, // for
+    tokenTo, // to
+    step,
     next,
     // case
     tokenCase,
