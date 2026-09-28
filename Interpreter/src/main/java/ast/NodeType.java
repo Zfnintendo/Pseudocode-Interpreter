@@ -14,4 +14,5 @@ public enum NodeType {
     assignment,
     output,
     input,
+    ifStatement,
 }

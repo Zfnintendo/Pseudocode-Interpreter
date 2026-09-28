@@ -15,6 +15,7 @@ import lexer.Token;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 public class MainParser {
 
@@ -87,12 +88,63 @@ public class MainParser {
         return this.program;
     }
 
+    private ast.IfStatement parseIfStatement() {
+        this.expect(TokenEnums.tokenIf, "Expected IF");
+
+        ast.Expression condition = this.parseExpression();
+
+        this.expect(TokenEnums.then, "Expected THEN after condition");
+        this.expect(TokenEnums.eol, "Expeted a new line after THEN");
+
+        ArrayList<ast.Statement> thenBody = this.parseBlock(Set.of(TokenEnums.tokenElse, TokenEnums.endIf));
+        ArrayList<ast.Statement> elseBody = new ArrayList<>();
+
+        if (this.currentType() == TokenEnums.tokenElse) {
+            this.eat();
+            this.expect(TokenEnums.eol, "Expected a new line after else.");
+
+            elseBody = this.parseBlock(Set.of(TokenEnums.endIf));
+        }
+
+        this.expect(TokenEnums.endIf, "Expected ENDIF");
+
+        return new IfStatement(condition, thenBody, elseBody);
+    }
+
+    private ArrayList<ast.Statement> parseBlock(Set<TokenEnums> endingToken) {
+        ArrayList<ast.Statement> body = new ArrayList<>();
+
+        while (true) {
+
+            // skip blanks
+            while (this.currentType() == TokenEnums.eol) {
+                this.eat();
+            }
+
+            if (endingToken.contains(this.currentType())) {
+                return body;
+            }
+
+            if (this.currentType() == TokenEnums.eof) {
+                throw new IllegalArgumentException("End of file reached when not intended. Expected: " + endingToken);
+            }
+
+            body.add(this.parseStatement());
+
+            if (this.currentType() != TokenEnums.eol && this.currentType() != TokenEnums.eof) {
+                throw new IllegalArgumentException("Expected end of line after statement.");
+            }
+
+        }
+    }
+
     private ast.Statement parseStatement() {
         return switch(this.currentType()) {
             case TokenEnums.declare -> this.parseVariableDeclaration();
             case TokenEnums.identifier -> this.parseAssignment();
             case TokenEnums.output -> this.parseOutput();
             case TokenEnums.input -> this.parseInput();
+            case TokenEnums.tokenIf -> this.parseIfStatement();
 
             default -> throw new IllegalArgumentException("Expected a statement, got: " + this.currentType());
         };
