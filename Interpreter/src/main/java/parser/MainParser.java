@@ -161,7 +161,44 @@ public class MainParser {
 
     // expressions start here
     private ast.Expression parseExpression() {
-        return this.parseConcatenationExpression();
+        return this.parseOrExpression();
+    }
+
+    private ast.Expression parseOrExpression() {
+        ast.Expression left = this.parseAndExpression();
+
+        while (this.currentType() == TokenEnums.or) {
+            String operator = ((Token) this.eat().getFirst()).getValue();
+            ast.Expression right = this.parseAndExpression();
+
+            left = new BinaryExpression(left, right, operator);
+        }
+
+        return left;
+    }
+
+    private ast.Expression parseAndExpression() {
+        ast.Expression left = this.parseNotExpression();
+
+        while (this.currentType() == TokenEnums.and) {
+            String operator = ((Token) this.eat().getFirst()).getValue();
+            ast.Expression right = this.parseNotExpression();
+
+            left = new BinaryExpression(left, right, operator);
+        }
+
+        return left;
+    }
+
+    private ast.Expression parseNotExpression() {
+        if (this.currentType() == TokenEnums.not) {
+            String operator = ((Token) this.eat().getFirst()).getValue();
+            ast.Expression operand = this.parseNotExpression();
+
+            return new UnaryExpression(operator, operand);
+        }
+
+        return this.parseComparisonExpression();
     }
 
     private ast.Expression parseComparisonExpression() {
