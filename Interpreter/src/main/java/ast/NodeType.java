@@ -15,4 +15,6 @@ public enum NodeType {
     output,
     input,
     ifStatement,
+    whileStatement,
+    repeatStatement,
 }

@@ -111,6 +111,31 @@ public class MainParser {
         return new IfStatement(condition, thenBody, elseBody);
     }
 
+    private ast.WhileStatement parseWhileStatement() {
+        this.expect(TokenEnums.tokenWhile, "Expected WHILE");
+
+        ast.Expression condition = this.parseExpression();
+        this.expect(TokenEnums.eol, "Expected a new line after WHILE condition.");
+
+        ArrayList<ast.Statement> body = this.parseBlock(Set.of(TokenEnums.endWhile));
+
+        this.expect(TokenEnums.endWhile, "Expected an ENDWHILE");
+
+        return new WhileStatement(condition, body);
+    }
+
+    private ast.RepeatStatement parseRepeatStatement() {
+        this.expect(TokenEnums.repeat, "Expected REPEAT.");
+        this.expect(TokenEnums.eol, "Expected a newline after REPEAT");
+
+        ArrayList<ast.Statement> body = this.parseBlock(Set.of(TokenEnums.until));
+
+        this.expect(TokenEnums.until, "Expected UNTIL.");
+        ast.Expression condition = this.parseExpression();
+
+        return new RepeatStatement(body, condition);
+    }
+
     private ArrayList<ast.Statement> parseBlock(Set<TokenEnums> endingToken) {
         ArrayList<ast.Statement> body = new ArrayList<>();
 
@@ -145,6 +170,8 @@ public class MainParser {
             case TokenEnums.output -> this.parseOutput();
             case TokenEnums.input -> this.parseInput();
             case TokenEnums.tokenIf -> this.parseIfStatement();
+            case TokenEnums.tokenWhile -> this.parseWhileStatement();
+            case TokenEnums.repeat -> this.parseRepeatStatement();
 
             default -> throw new IllegalArgumentException("Expected a statement, got: " + this.currentType());
         };
