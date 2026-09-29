@@ -208,6 +208,7 @@ public class MainParser {
             case TokenEnums.tokenIf -> this.parseIfStatement();
             case TokenEnums.tokenWhile -> this.parseWhileStatement();
             case TokenEnums.repeat -> this.parseRepeatStatement();
+            case TokenEnums.tokenFor -> this.parseForStatement();
 
             default -> throw new IllegalArgumentException("Expected a statement, got: " + this.currentType());
         };
@@ -441,7 +442,7 @@ public class MainParser {
                 return value;
             }
             default: {
-                throw new UnknownError("Unexpected token found during parsing!");
+                throw new IllegalArgumentException("Expected an expression, got: " + tkType + ",value '" + tkValue + "'");
             }
         }
 
