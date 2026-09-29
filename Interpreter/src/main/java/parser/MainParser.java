@@ -99,8 +99,13 @@ public class MainParser {
 
         ast.Expression condition = this.parseExpression();
 
-        this.expect(TokenEnums.then, "Expected THEN after condition");
-        this.expect(TokenEnums.eol, "Expeted a new line after THEN");
+        if (this.currentType() == TokenEnums.eol) {
+            this.eat();
+        }
+
+        this.expect(TokenEnums.then, "Expected THEN after the IF condition.");
+
+        this.expect(TokenEnums.eol, "Expected a newline after THEN.");
 
         ArrayList<ast.Statement> thenBody = this.parseBlock(Set.of(TokenEnums.tokenElse, TokenEnums.endIf));
         ArrayList<ast.Statement> elseBody = new ArrayList<>();
