@@ -346,6 +346,36 @@ public class MainParser {
         throw new IllegalArgumentException("Expression can not be used as an assignment target.");
     }
 
+    private ArrayList<ast.Parameter> parseParameters() {
+        this.expect(TokenEnums.leftParen, "Expected '(' before parameters.");
+
+        ArrayList<ast.Parameter> parameters = new ArrayList<>();
+
+        if (this.currentType() != TokenEnums.rightParen) {
+            while (true) {
+                ArrayList<Object> tokenObject = this.expect(TokenEnums.identifier, "Expected parameter name.");
+
+                String name = ((Token) tokenObject.getFirst()).getValue();
+
+                this.expect(TokenEnums.colon, "Expected ':' after parameter name.");
+
+                ast.TypeSpecification type = this.parseType();
+
+                parameters.add(new ast.Parameter(name, type));
+
+                if (this.currentType() != TokenEnums.comma) {
+                    break;
+                }
+
+                this.eat();
+            }
+        }
+
+        this.expect(TokenEnums.rightParen, "Expected ')' after parameters.");
+
+        return parameters;
+    }
+
 
 
 
