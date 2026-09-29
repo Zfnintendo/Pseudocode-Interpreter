@@ -64,6 +64,9 @@ public class MainParser {
         };
     }
 
+
+
+    // main method
     public Program produceAST(ArrayList<ArrayList<Object>> lexedFile) {
 
         this.tokens = lexedFile;
@@ -87,6 +90,9 @@ public class MainParser {
 
         return this.program;
     }
+    // main method
+
+
 
     private ast.IfStatement parseIfStatement() {
         this.expect(TokenEnums.tokenIf, "Expected IF");

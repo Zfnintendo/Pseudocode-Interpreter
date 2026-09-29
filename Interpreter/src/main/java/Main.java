@@ -1,5 +1,7 @@
 import reader.MainReader;
 import lexer.MainLexer;
+import parser.MainParser;
+import parser.Program;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,6 +37,11 @@ public class Main {
             System.out.println(lexedFile);
 
             // parser
+
+            MainParser mainParser = new MainParser();
+            Program abstractSyntaxTree = mainParser.produceAST(lexedFile);
+
+            System.out.println(abstractSyntaxTree);
 
 
 
