@@ -217,6 +217,8 @@ public class MainParser {
             case TokenEnums.tokenWhile -> this.parseWhileStatement();
             case TokenEnums.repeat -> this.parseRepeatStatement();
             case TokenEnums.tokenFor -> this.parseForStatement();
+            case TokenEnums.function -> this.parseFunctionDeclaration();
+            case TokenEnums.tokenReturn -> this.parseReturnStatement();
 
             default -> throw new IllegalArgumentException("Expected a statement, got: " + this.currentType());
         };
@@ -254,6 +256,28 @@ public class MainParser {
         ast.TypeSpecification type = this.parseType();
 
         return new VariableDeclaration(name, type);
+    }
+
+    private ast.FunctionDeclaration parseFunctionDeclaration() {
+        this.expect(TokenEnums.function, "Expected FUNCTION.");
+
+        ArrayList<Object> tokenObject = this.expect(TokenEnums.identifier, "Expected function name.");
+
+        String name = ((Token) tokenObject.getFirst()).getValue();
+
+        ArrayList<ast.Parameter> parameters = this.parseParameters();
+
+        this.expect(TokenEnums.returns, "Expected RETURNS after parameters.");
+
+        ast.TypeSpecification returnType = this.parseType();
+
+        this.expect(TokenEnums.eol, "Expected a new line after function statement.");
+
+        ArrayList<ast.Statement> body = this.parseBlock(Set.of(TokenEnums.endFunction));
+
+        this.expect(TokenEnums.endFunction, "Expected ENDFUNCTION.");
+
+        return new FunctionDeclaration(name, parameters, returnType, body);
     }
 
     private ast.Assignment parseAssignment() {
@@ -375,6 +399,7 @@ public class MainParser {
 
         return parameters;
     }
+
 
 
 
