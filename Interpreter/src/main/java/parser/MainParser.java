@@ -217,10 +217,7 @@ public class MainParser {
     private ast.Input parseInput() {
         this.expect(TokenEnums.input, "Expected INPUT");
 
-        ArrayList<Object> tokenObject = this.expect(TokenEnums.identifier, "Expected a variable name.");
-        String name = ((Token) tokenObject.getFirst()).getValue();
-
-        return new Input(new Identifier(name));
+        return new Input(this.parseTarget());
     }
 
     private ast.Output parseOutput() {
@@ -252,15 +249,13 @@ public class MainParser {
     }
 
     private ast.Assignment parseAssignment() {
-        ArrayList<Object> tokenObject = this.expect(TokenEnums.identifier, "Expected assignment variable.");
+        ast.Assignable target = this.parseTarget();
 
-        String name = ((Token) tokenObject.getFirst()).getValue();
-
-        this.expect(TokenEnums.assignment, "Expected '<-' after assignment variable");
+        this.expect(TokenEnums.assignment,"Expected '<-' after assignment target.");
 
         ast.Expression value = this.parseExpression();
 
-        return new Assignment(new Identifier(name), value);
+        return new Assignment(target, value);
     }
 
     private ast.TypeSpecification parseType() {
@@ -308,6 +303,20 @@ public class MainParser {
                 throw new IllegalArgumentException("Expected a data type, got: " + type);
             }
         }
+    }
+
+    private ast.Assignable parseTarget() {
+        if (this.currentType() != TokenEnums.identifier) {
+            throw new IllegalArgumentException("Expected a variable or array element.");
+        }
+
+        ast.Expression expression = this.parseArrayAccessExpression();
+
+        if (expression instanceof ast.Assignable target) {
+            return target;
+        }
+
+        throw new IllegalArgumentException("Expression can not be used as an assignment target.");
     }
 
 
@@ -431,7 +440,34 @@ public class MainParser {
             return new UnaryExpression(operator, operand);
         }
 
-        return this.parsePrimaryExpression();
+        return this.parseArrayAccessExpression();
+    }
+
+    private ast.Expression parseArrayAccessExpression() {
+        ast.Expression expression = this.parsePrimaryExpression();
+
+        if (this.currentType() == TokenEnums.leftBracket) {
+            if (!(expression instanceof ast.Identifier base)) {
+                throw new IllegalArgumentException("Expected an array identifier before '['.");
+            }
+
+            this.eat();
+
+            ArrayList<ast.Expression> indices = new ArrayList<>();
+
+            indices.add(this.parseExpression());
+
+            while (this.currentType() == TokenEnums.comma)  {
+                this.eat();
+                indices.add(this.parseExpression());
+            }
+
+            this.expect(TokenEnums.rightBracket, "Expected ']' after array indices.");
+
+            expression = new IndexExpression(base, indices);
+        }
+
+        return expression;
     }
 
     private ast.Expression parsePrimaryExpression() {

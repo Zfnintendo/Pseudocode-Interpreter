@@ -1,6 +1,6 @@
 package ast;
 
-public interface Identifier extends Expression{
+public interface Identifier extends Assignable{
 
     @Override
     NodeType kind(); // identifier

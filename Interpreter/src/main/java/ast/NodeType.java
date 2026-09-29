@@ -9,6 +9,7 @@ public enum NodeType {
     binaryExpression,
     callExpression,
     unaryExpression,
+    indexExpression,
     functionDeclaration,
     variableDeclaration,
     assignment,

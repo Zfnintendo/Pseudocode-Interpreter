@@ -5,6 +5,6 @@ public interface Input extends Statement {
     @Override
     NodeType kind();
 
-    Identifier identifier();
+    Assignable target();
 
 }

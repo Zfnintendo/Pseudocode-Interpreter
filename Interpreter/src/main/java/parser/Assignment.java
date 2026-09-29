@@ -1,14 +1,15 @@
 package parser;
 
+import ast.Assignable;
 import ast.Expression;
 import ast.NodeType;
 
 public class Assignment implements ast.Assignment {
 
-    private final Identifier target;
+    private final Assignable target;
     private final Expression value;
 
-    public Assignment(Identifier target, Expression value) {
+    public Assignment(Assignable target, Expression value) {
         this.target = target;
         this.value = value;
     }
@@ -19,7 +20,7 @@ public class Assignment implements ast.Assignment {
     }
 
     @Override
-    public Identifier target() {
+    public Assignable target() {
         return this.target;
     }
 

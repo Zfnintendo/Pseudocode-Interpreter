@@ -1,14 +1,14 @@
 package parser;
 
-import ast.Identifier;
+import ast.Assignable;
 import ast.NodeType;
 
 public class Input implements ast.Input{
 
-    private final Identifier identifier;
+    private final Assignable target;
 
-    public Input(Identifier identifier) {
-        this.identifier = identifier;
+    public Input(Assignable target) {
+        this.target = target;
     }
 
     @Override
@@ -17,8 +17,8 @@ public class Input implements ast.Input{
     }
 
     @Override
-    public Identifier identifier() {
-        return this.identifier;
+    public Assignable target() {
+        return this.target;
     }
 
 }
