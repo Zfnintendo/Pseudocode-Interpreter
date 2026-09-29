@@ -246,18 +246,7 @@ public class MainParser {
 
         this.expect(TokenEnums.colon, "Expected ':' after variable name.");
 
-        TokenEnums type = this.currentType();
-
-        switch (type) {
-            case TokenEnums.typeInteger, TokenEnums.typeReal, TokenEnums.typeChar, TokenEnums.typeString, TokenEnums.typeBoolean: {
-                this.eat();
-                break;
-            }
-            default: {
-                throw new IllegalArgumentException("Expected data type after ':', got: " + type);
-            }
-
-        }
+        ast.TypeSpecification type = this.parseType();
 
         return new VariableDeclaration(name, type);
     }
@@ -273,6 +262,55 @@ public class MainParser {
 
         return new Assignment(new Identifier(name), value);
     }
+
+    private ast.TypeSpecification parseType() {
+        if (this.currentType() == TokenEnums.typeArray) {
+            this.eat();
+
+            this.expect(TokenEnums.leftBracket, "Expected '[' after ARRAY.");
+
+            ArrayList<ast.ArrayBounds> bounds = new ArrayList<>();
+
+            while (true) {
+                ast.Expression lower = this.parseExpression();
+
+                this.expect(TokenEnums.colon, "Expected ':' between the bounds.");
+
+                ast.Expression upper = this.parseExpression();
+
+                bounds.add(new ast.ArrayBounds(lower, upper));
+
+                if (this.currentType() != TokenEnums.comma) {
+                    break;
+                }
+
+                this.eat();
+            }
+
+            this.expect(TokenEnums.rightBracket, "Expected ']' after the bounds declaration.");
+
+            this.expect(TokenEnums.of, "Expected OF after array.");
+
+            ast.TypeSpecification elementType = this.parseType();
+
+            return new ast.ArrayType(bounds, elementType);
+        }
+
+        TokenEnums type = this.currentType();
+
+        switch (type) {
+            case TokenEnums.typeInteger, TokenEnums.typeReal, TokenEnums.typeChar, TokenEnums.typeString, TokenEnums.typeBoolean: {
+                this.eat();
+                return new ast.ScalarType(type);
+            }
+
+            default: {
+                throw new IllegalArgumentException("Expected a data type, got: " + type);
+            }
+        }
+    }
+
+
 
 
     // expressions start here

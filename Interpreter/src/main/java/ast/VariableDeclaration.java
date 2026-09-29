@@ -7,6 +7,6 @@ public interface VariableDeclaration extends Statement {
     NodeType kind();
 
     String name();
-    TokenEnums declaredType();
+    TypeSpecification declaredType();
 
 }

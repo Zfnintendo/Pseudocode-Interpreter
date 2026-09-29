@@ -1,14 +1,14 @@
 package parser;
 
 import ast.NodeType;
-import lexer.TokenEnums;
+import ast.TypeSpecification;
 
 public class VariableDeclaration implements ast.VariableDeclaration {
 
     private final String name;
-    private final TokenEnums type;
+    private final TypeSpecification type;
 
-    public VariableDeclaration(String name, TokenEnums type) {
+    public VariableDeclaration(String name, TypeSpecification type) {
         this.name = name;
         this.type = type;
     }
@@ -24,7 +24,7 @@ public class VariableDeclaration implements ast.VariableDeclaration {
     }
 
     @Override
-    public TokenEnums declaredType() {
+    public TypeSpecification declaredType() {
         return this.type;
     }
 
