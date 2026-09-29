@@ -258,6 +258,25 @@ public class MainParser {
         return new Assignment(target, value);
     }
 
+    private ArrayList<ast.Expression> parseArguments() {
+        this.expect(TokenEnums.leftParen, "Expected '(' before arguments.");
+
+        ArrayList<ast.Expression> arguments = new ArrayList<>();
+
+        if (this.currentType() != TokenEnums.rightParen) {
+            arguments.add(this.parseExpression());
+
+            while (this.currentType() == TokenEnums.comma) {
+                this.eat();
+                arguments.add(this.parseExpression());
+            }
+        }
+
+        this.expect(TokenEnums.rightParen, "Expected ')' after arguments.");
+
+        return arguments;
+    }
+
     private ast.TypeSpecification parseType() {
         if (this.currentType() == TokenEnums.typeArray) {
             this.eat();
@@ -478,7 +497,13 @@ public class MainParser {
 
         switch(tkType) {
             case TokenEnums.identifier: {
-                return new Identifier(tkValue);
+                String name = tkValue;
+
+                if (this.currentType() == TokenEnums.leftParen) {
+                    return new CallExpression(name, this.parseArguments());
+                }
+
+                return new Identifier(name);
             }
             case TokenEnums.literalInteger, TokenEnums.literalReal: {
                 return new NumericLiteral(tkValue);
