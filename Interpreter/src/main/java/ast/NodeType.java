@@ -19,4 +19,5 @@ public enum NodeType {
     whileStatement,
     repeatStatement,
     forStatement,
+    returnStatement,
 }

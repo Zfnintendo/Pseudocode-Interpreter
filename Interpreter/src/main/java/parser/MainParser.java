@@ -172,6 +172,14 @@ public class MainParser {
         return new ForStatement(new Identifier(variableName), start, end, step, body);
     }
 
+    private ast.ReturnStatement parseReturnStatement() {
+        this.expect(TokenEnums.tokenReturn, "Expected RETURN");
+
+        ast.Expression value = this.parseExpression();
+
+        return new ReturnStatement(value);
+    }
+
     private ArrayList<ast.Statement> parseBlock(Set<TokenEnums> endingToken) {
         ArrayList<ast.Statement> body = new ArrayList<>();
 
