@@ -97,6 +97,7 @@ public class MainParser {
     private ast.Statement parseStatement() {
         return switch(this.currentType()) {
             case TokenEnums.declare -> this.parseVariableDeclaration();
+            case TokenEnums.constant -> this.parseConstantDeclaration();
             case TokenEnums.identifier -> this.parseAssignment();
 
             case TokenEnums.output -> this.parseOutput();
@@ -332,6 +333,46 @@ public class MainParser {
         return new ProcedureDeclaration(name, parameters, body);
     }
 
+    private ast.ConstantDeclaration parseConstantDeclaration() {
+        this.expect(TokenEnums.constant, "Expected CONSTANT.");
+
+        ArrayList<Object> tokenObject = this.expect(TokenEnums.identifier, "Expected the constant's name.");
+
+        String name = ((Token) tokenObject.getFirst()).getValue();
+
+        this.expect(TokenEnums.assignment, "Expected '<-' after constant variable.");
+
+        ast.Expression value = this.parseConstantLiteral();
+
+        if (this.currentType() != TokenEnums.eol && this.currentType() != TokenEnums.eof)  {
+            throw new IllegalArgumentException("A constant value must be a single literal.");
+        }
+
+        return new ConstantDeclaration(name, value);
+    }
+
+    private ast.Expression parseConstantLiteral() {
+
+        if (this.currentType() == TokenEnums.subtraction) {
+            this.eat();
+
+            if (this.currentType() != TokenEnums.literalInteger && this.currentType() != TokenEnums.literalReal) {
+                throw new IllegalArgumentException("Expected a numeric literal after '-'.");
+            }
+
+            String value = ((Token) this.eat().getFirst()).getValue();
+
+            return new NumericLiteral("-" + value);
+
+        }
+
+        return switch (this.currentType()) {
+            case TokenEnums.literalInteger, TokenEnums.literalReal, TokenEnums.doubleQuote, TokenEnums.singleQuote, TokenEnums.literalBoolean -> this.parsePrimaryExpression();
+
+            default -> throw new IllegalArgumentException("Expected a literal constant value, got: " + this.currentType());
+        };
+    }
+
     private ast.Assignment parseAssignment() {
         ast.Assignable target = this.parseTarget();
 
@@ -451,6 +492,8 @@ public class MainParser {
 
         return parameters;
     }
+
+
 
 
 

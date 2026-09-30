@@ -13,6 +13,7 @@ public enum NodeType {
     functionDeclaration,
     procedureDeclaration,
     variableDeclaration,
+    constantDeclaration,
     assignment,
     output,
     input,
