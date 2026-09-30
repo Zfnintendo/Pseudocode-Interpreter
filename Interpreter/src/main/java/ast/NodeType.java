@@ -23,4 +23,5 @@ public enum NodeType {
     forStatement,
     returnStatement,
     callStatement,
+    caseStatement,
 }

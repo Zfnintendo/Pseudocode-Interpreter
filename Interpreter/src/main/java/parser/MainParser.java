@@ -16,6 +16,7 @@ import lexer.Token;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.Optional;
 
 public class MainParser {
 
@@ -107,6 +108,7 @@ public class MainParser {
             case TokenEnums.tokenWhile -> this.parseWhileStatement();
             case TokenEnums.repeat -> this.parseRepeatStatement();
             case TokenEnums.tokenFor -> this.parseForStatement();
+            case TokenEnums.tokenCase -> this.parseCaseStatement();
 
             case TokenEnums.function -> this.parseFunctionDeclaration();
             case TokenEnums.tokenReturn -> this.parseReturnStatement();
@@ -228,6 +230,63 @@ public class MainParser {
         }
 
         return new CallStatement(new CallExpression(name, arguments));
+    }
+
+    private ast.CaseStatement parseCaseStatement() {
+        this.expect(TokenEnums.tokenCase, "Expected CASE.");
+        this.expect(TokenEnums.of, "Expected OF after CASE.");
+
+        ArrayList<Object> selectorTokenObject = this.expect(TokenEnums.identifier, "Expected selector identifier after CASE OF.");
+
+        String name = ((Token) selectorTokenObject.getFirst()).getValue();
+
+        this.expect(TokenEnums.eol, "Expected a new line after CASE OF <IDENTIFIER>.");
+
+        ArrayList<ast.Cases> cases = new ArrayList<>();
+        Optional<ast.Statement> otherwiseCase = Optional.empty();
+
+        while (true) {
+            while (this.currentType() == TokenEnums.eol) {
+                this.eat();
+            }
+
+            if (this.currentType() == TokenEnums.endCase) {
+                break;
+            }
+
+            if (this.currentType() == TokenEnums.eof) {
+                throw new IllegalArgumentException("Unexpected end of file. Expected ENDCASE.");
+            }
+
+            if (otherwiseCase.isPresent()) {
+                throw new IllegalArgumentException("OTHERWISE must be the final CASE case.");
+            }
+
+            if (this.currentType() == TokenEnums.otherwise) {
+                this.eat();
+
+                ast.Statement statement = this.parseStatement();
+                otherwiseCase = Optional.of(statement);
+            } else {
+                ast.Expression value = this.parseConstantLiteral();
+
+                this.expect(TokenEnums.colon, "Expected ':' after CASE value.");
+
+                ast.Statement statement = this.parseStatement();
+
+                cases.add(new ast.Cases(value, statement));
+            }
+
+            this.expect(TokenEnums.eol, "Expected a new line after CASE case.");
+        }
+
+        if (cases.isEmpty()) {
+            throw new IllegalArgumentException("CASE requires atleast one case branch.");
+        }
+
+        this.expect(TokenEnums.endCase, "Expected ENDCASE.");
+
+        return new CaseStatement(new Identifier(name), cases, otherwiseCase);
     }
 
     private ArrayList<ast.Statement> parseBlock(Set<TokenEnums> endingToken) {
