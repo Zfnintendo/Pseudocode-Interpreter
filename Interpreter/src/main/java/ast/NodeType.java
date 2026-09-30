@@ -11,6 +11,7 @@ public enum NodeType {
     unaryExpression,
     indexExpression,
     functionDeclaration,
+    procedureDeclaration,
     variableDeclaration,
     assignment,
     output,
@@ -20,4 +21,5 @@ public enum NodeType {
     repeatStatement,
     forStatement,
     returnStatement,
+    callStatement,
 }

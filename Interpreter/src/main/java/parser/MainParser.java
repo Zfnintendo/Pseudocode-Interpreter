@@ -94,6 +94,28 @@ public class MainParser {
 
 
 
+    private ast.Statement parseStatement() {
+        return switch(this.currentType()) {
+            case TokenEnums.declare -> this.parseVariableDeclaration();
+            case TokenEnums.identifier -> this.parseAssignment();
+
+            case TokenEnums.output -> this.parseOutput();
+            case TokenEnums.input -> this.parseInput();
+
+            case TokenEnums.tokenIf -> this.parseIfStatement();
+            case TokenEnums.tokenWhile -> this.parseWhileStatement();
+            case TokenEnums.repeat -> this.parseRepeatStatement();
+            case TokenEnums.tokenFor -> this.parseForStatement();
+
+            case TokenEnums.function -> this.parseFunctionDeclaration();
+            case TokenEnums.tokenReturn -> this.parseReturnStatement();
+            case TokenEnums.procedure -> this.parseProcedureDeclaration();
+            case TokenEnums.call -> this.parseCallStatement();
+
+            default -> throw new IllegalArgumentException("Expected a statement, got: " + this.currentType());
+        };
+    }
+
     private ast.IfStatement parseIfStatement() {
         this.expect(TokenEnums.tokenIf, "Expected IF");
 
@@ -191,6 +213,22 @@ public class MainParser {
         return new ReturnStatement(value);
     }
 
+    private ast.CallStatement parseCallStatement() {
+        this.expect(TokenEnums.call, "Expected CALL.");
+
+        ArrayList<Object> tokenObject = this.expect(TokenEnums.identifier, "Expected procedure name after CALL.");
+
+        String name = ((Token) tokenObject.getFirst()).getValue();
+
+        ArrayList<ast.Expression> arguments = new ArrayList<>();
+
+        if (this.currentType() == TokenEnums.leftParen) {
+            arguments = this.parseArguments();
+        }
+
+        return new CallStatement(new CallExpression(name, arguments));
+    }
+
     private ArrayList<ast.Statement> parseBlock(Set<TokenEnums> endingToken) {
         ArrayList<ast.Statement> body = new ArrayList<>();
 
@@ -218,22 +256,7 @@ public class MainParser {
         }
     }
 
-    private ast.Statement parseStatement() {
-        return switch(this.currentType()) {
-            case TokenEnums.declare -> this.parseVariableDeclaration();
-            case TokenEnums.identifier -> this.parseAssignment();
-            case TokenEnums.output -> this.parseOutput();
-            case TokenEnums.input -> this.parseInput();
-            case TokenEnums.tokenIf -> this.parseIfStatement();
-            case TokenEnums.tokenWhile -> this.parseWhileStatement();
-            case TokenEnums.repeat -> this.parseRepeatStatement();
-            case TokenEnums.tokenFor -> this.parseForStatement();
-            case TokenEnums.function -> this.parseFunctionDeclaration();
-            case TokenEnums.tokenReturn -> this.parseReturnStatement();
 
-            default -> throw new IllegalArgumentException("Expected a statement, got: " + this.currentType());
-        };
-    }
 
     private ast.Input parseInput() {
         this.expect(TokenEnums.input, "Expected INPUT");
@@ -289,6 +312,24 @@ public class MainParser {
         this.expect(TokenEnums.endFunction, "Expected ENDFUNCTION.");
 
         return new FunctionDeclaration(name, parameters, returnType, body);
+    }
+
+    private ast.ProcedureDeclaration parseProcedureDeclaration() {
+        this.expect(TokenEnums.procedure, "Expected PROCEDURE.");
+
+        ArrayList<Object> tokenObject = this.expect(TokenEnums.identifier, "Expected procedure name.");
+
+        String name = ((Token) tokenObject.getFirst()).getValue();
+
+        ArrayList<ast.Parameter> parameters = this.parseParameters();
+
+        this.expect(TokenEnums.eol, "Expected a new line after the declaration statement.");
+
+        ArrayList<ast.Statement> body = this.parseBlock(Set.of(TokenEnums.endProcedure));
+
+        this.expect(TokenEnums.endProcedure, "Expected ENDPROCEDURE.");
+
+        return new ProcedureDeclaration(name, parameters, body);
     }
 
     private ast.Assignment parseAssignment() {
