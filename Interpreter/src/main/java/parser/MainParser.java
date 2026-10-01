@@ -115,6 +115,11 @@ public class MainParser {
             case TokenEnums.procedure -> this.parseProcedureDeclaration();
             case TokenEnums.call -> this.parseCallStatement();
 
+            case TokenEnums.openFile -> this.parseOpenFileStatement();
+            case TokenEnums.readFile -> this.parseReadFileStatement();
+            case TokenEnums.writeFile -> this.parseWriteFileStatement();
+            case TokenEnums.closeFile -> this.parseCloseFileStatement();
+
             default -> throw new IllegalArgumentException("Expected a statement, got: " + this.currentType());
         };
     }
@@ -289,6 +294,70 @@ public class MainParser {
         return new CaseStatement(new Identifier(name), cases, otherwiseCase);
     }
 
+    private ast.OpenFileStatement parseOpenFileStatement() {
+        this.expect(TokenEnums.openFile, "Expected OPENFILE.");
+
+        ast.Expression filename = this.parseFileName();
+
+        this.expect(TokenEnums.tokenFor, "Expected FOR after filename.");
+
+        ast.FileMode mode = switch (this.currentType()) {
+            case TokenEnums.read -> ast.FileMode.READ;
+            case TokenEnums.write -> ast.FileMode.WRITE;
+
+            default -> throw new IllegalArgumentException("Expected READ or WRITE after FOR.");
+        };
+
+        this.eat();
+
+        return new OpenFileStatement(filename, mode);
+    }
+
+    private ast.ReadFileStatement parseReadFileStatement() {
+        this.expect(TokenEnums.readFile, "Expected READFILE");
+
+        ast.Expression filename = this.parseFileName();
+
+        this.expect(TokenEnums.comma, "Expected ',' after file name.");
+
+        ast.Assignable target = this.parseTarget();
+
+        return new ReadFileStatement(filename, target);
+    }
+
+    private ast.WriteFileStatement parseWriteFileStatement() {
+        this.expect(TokenEnums.writeFile, "Expected WRITEFILE.");
+
+        ast.Expression filename = this.parseFileName();
+
+        this.expect(TokenEnums.comma, "Expected ',' after file name.");
+
+        ast.Expression value = this.parseTarget();
+
+        return new WriteFileStatement(filename, value);
+    }
+
+    private ast.CloseFileStatement parseCloseFileStatement() {
+        this.expect(TokenEnums.closeFile, "Expected CLOSEFILE.");
+
+        ast.Expression filename = this.parseFileName();
+
+        return new CloseFileStatement(filename);
+    }
+
+    private ast.Expression parseFileName() {
+        if (this.currentType() == TokenEnums.identifier) {
+            String name = ((Token) this.eat().getFirst()).getValue();
+            return new Identifier(name);
+        }
+
+        if (this.currentType() == TokenEnums.doubleQuote) {
+            return this.parsePrimaryExpression();
+        }
+
+        throw new IllegalArgumentException("Expected a string file name or file name variable.");
+    }
+
     private ArrayList<ast.Statement> parseBlock(Set<TokenEnums> endingToken) {
         ArrayList<ast.Statement> body = new ArrayList<>();
 
@@ -315,8 +384,6 @@ public class MainParser {
 
         }
     }
-
-
 
     private ast.Input parseInput() {
         this.expect(TokenEnums.input, "Expected INPUT");
