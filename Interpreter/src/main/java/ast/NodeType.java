@@ -24,4 +24,8 @@ public enum NodeType {
     returnStatement,
     callStatement,
     caseStatement,
+    openFileStatement,
+    readFileStatement,
+    writeFileStatement,
+    closeFileStatement,
 }
