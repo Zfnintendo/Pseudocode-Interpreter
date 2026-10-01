@@ -722,6 +722,9 @@ public class MainParser {
 
                 return new Identifier(name);
             }
+            case TokenEnums.length, TokenEnums.lCase, TokenEnums.uCase, TokenEnums.subString, TokenEnums.round, TokenEnums.random, TokenEnums.div, TokenEnums.mod: {
+                return new CallExpression(tkValue, this.parseArguments());
+            }
             case TokenEnums.literalInteger, TokenEnums.literalReal: {
                 return new NumericLiteral(tkValue);
             }
