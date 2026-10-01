@@ -676,7 +676,21 @@ public class MainParser {
             return new UnaryExpression(operator, operand);
         }
 
-        return this.parseArrayAccessExpression();
+        return this.parsePowerExpression();
+    }
+
+    private ast.Expression parsePowerExpression() {
+        ast.Expression left = this.parseArrayAccessExpression();
+
+        if (this.currentType() == TokenEnums.exponent) {
+            String operator = ((Token) this.eat().getFirst()).getValue();
+
+            ast.Expression right = this.parseUnaryExpression();
+
+            return new BinaryExpression(left, right, operator);
+        }
+
+        return left;
     }
 
     private ast.Expression parseArrayAccessExpression() {
