@@ -45,6 +45,7 @@ public class LineTokenizer {
         keywordStrings.add("OF");
         keywordStrings.add("IF");
         keywordStrings.add("TO");
+        keywordStrings.add("//");
 
         keywordStrings.add("AND");
         keywordStrings.add("DIV");
@@ -384,6 +385,9 @@ public class LineTokenizer {
                     addToken.addToLine(token, TokenEnums.tokenTo);
                     i++;
                     break;
+                }
+                case "//": { // we end this loop due to the rest of the line being a comment.
+                    i = this.line.length();
                 }
             } // end of second switch
 
