@@ -2,6 +2,7 @@ import reader.MainReader;
 import lexer.MainLexer;
 import parser.MainParser;
 import parser.Program;
+import evaluator.AstPrinter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,6 +43,8 @@ public class Main {
             Program abstractSyntaxTree = mainParser.produceAST(lexedFile);
 
             System.out.println(abstractSyntaxTree);
+
+            AstPrinter.printTree(abstractSyntaxTree);
 
 
 

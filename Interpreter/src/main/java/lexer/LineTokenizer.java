@@ -113,6 +113,7 @@ public class LineTokenizer {
     public ArrayList<ArrayList<Object>> tokenize() {
         AddToken addToken = new AddToken();
 
+        scanLine:
         for (int i = 0; i < this.line.length(); i++) {
             TokenLocation tokenLocation = new TokenLocation(this.lineNumber, i);
 
@@ -139,6 +140,8 @@ public class LineTokenizer {
                     break;
                 }
                 case '/': {
+                    if (i + 1 < this.line.length() && this.line.charAt(i + 1) == '/') { break scanLine;} // checks for comments
+
                     Token token = new Token(TokenType.operator, "/", tokenLocation);
                     addToken.addToLine(token, TokenEnums.division);
                     break;
@@ -385,9 +388,6 @@ public class LineTokenizer {
                     addToken.addToLine(token, TokenEnums.tokenTo);
                     i++;
                     break;
-                }
-                case "//": { // we end this loop due to the rest of the line being a comment.
-                    i = this.line.length();
                 }
             } // end of second switch
 
