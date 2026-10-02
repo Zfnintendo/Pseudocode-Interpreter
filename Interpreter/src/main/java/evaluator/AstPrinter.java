@@ -22,6 +22,17 @@ public class AstPrinter {
         switch (value) {
             case Program program -> children(nextDepth,"body", program.body());
 
+            // ok i think these lines are getting really long if i use their full names so we sub for n
+            case VariableDeclaration n -> children(nextDepth, "name", n.name(), "declaredType", n.declaredType());
+            case ConstantDeclaration n -> children(nextDepth, "name", n.name(), "value", n.value());
+
+            case Assignment n -> children(nextDepth, "target", n.target(), "value", n.value());
+
+            case BinaryExpression n -> children(nextDepth, "operator", n.operator(), "left", n.LHS(), "right", n.RHS());
+            case UnaryExpression n -> children(nextDepth, "operator", n.operator(), "operand", n.operand());
+            case IndexExpression n -> children(nextDepth, "base", n.base(), "indices", n.indices());
+
+
             default -> throw new IllegalArgumentException("Unsupported AST object: " + value.getClass().getName());
         }
 
