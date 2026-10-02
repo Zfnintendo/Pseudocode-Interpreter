@@ -32,6 +32,52 @@ public class AstPrinter {
             case UnaryExpression n -> children(nextDepth, "operator", n.operator(), "operand", n.operand());
             case IndexExpression n -> children(nextDepth, "base", n.base(), "indices", n.indices());
 
+            case Input n -> children(nextDepth, "target", n.target());
+            case Output n -> children(nextDepth, "values", n.values());
+
+            case IfStatement n -> children(nextDepth, "condition", n.condition(), "thenBody", n.thenBody(), "elseBody", n.elseBody());
+            case WhileStatement n -> children(nextDepth, "condition", n.condition(), "body", n.body());
+            case RepeatStatement n -> children(nextDepth, "body", n.body(), "condition", n.condition());
+            case ForStatement n -> children(nextDepth, "variable", n.variable(), "start", n.start(), "end", n.end(), "step", n.step(), "body", n.body());
+            case ReturnStatement n -> children(nextDepth, "value", n.value());
+
+            case CaseStatement n -> children(nextDepth, "selector", n.selector(), "cases", n.cases(), "otherwise", n.otherwiseCase());
+            case Cases n -> children(nextDepth, "value", n.value(), "statement", n.statement());
+
+            case CallStatement n -> children(nextDepth, "call", n.call());
+            case CallExpression n -> children(nextDepth, "name", n.name(), "arguments", n.arguments());
+
+            case FunctionDeclaration n -> children(nextDepth, "name", n.name(), "parameters", n.parameters(), "returnType", n.returnType(), "body", n.body());
+            case ProcedureDeclaration n -> children(nextDepth, "name", n.name(), "parameters", n.parameters(), "body", n.body());
+
+            case Parameter n -> children(nextDepth, "name", n.name());
+
+            case ArrayType n -> children(nextDepth, "bounds", n.bounds(), "elementType", n.elementType());
+            case ArrayBounds n -> children(nextDepth, "lower", n.lower(), "upper", n.upper());
+
+            case OpenFileStatement n -> children(nextDepth, "filename", n.filename(), "mode", n.mode());
+            case ReadFileStatement n -> children(nextDepth, "filename", n.filename(), "target", n.target());
+            case WriteFileStatement n -> children(nextDepth, "filename", n.filename(), "value", n.value());
+            case CloseFileStatement n -> children(nextDepth, "filename", n.filename());
+
+            case Identifier ignore -> {}
+            case NumericLiteral ignore -> {}
+            case TextLiteral ignore -> {}
+            case BooleanLiteral ignore -> {}
+            case ScalarType ignore -> {}
+            case String ignore -> {}
+            case FileMode ignore -> {}
+
+            case List<?> items -> {
+                for (int i = 0; i < items.size(); i++) {
+                    printNode("[" + i + "]", items.get(i), nextDepth);
+                }
+            }
+            case Optional<?> optional -> {
+                if (optional.isPresent()) {
+                    printNode("value", optional.get(), nextDepth);
+                }
+            }
 
             default -> throw new IllegalArgumentException("Unsupported AST object: " + value.getClass().getName());
         }
@@ -71,7 +117,7 @@ public class AstPrinter {
 
             case List<?> items -> "List[" +items.size() + ']';
 
-            case Optional<?> optional -> optional.isPresent()? "present" : "absent";
+            case Optional<?> optional -> optional.isPresent() ? "present" : "absent";
 
             case String text -> quote(text);
             case FileMode mode -> mode.name();
