@@ -49,3 +49,5 @@ switch(stringA) { // checks for two character tokens
                     break;
                 }
 ```
+
+### Parser
