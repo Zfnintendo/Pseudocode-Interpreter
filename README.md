@@ -30,7 +30,7 @@ Scanner scanner = new Scanner(this.file);
 As seen in this code as shown above ^ this simply creates a scanner instance and has that scanner iterate line by
 line and tokenize each line then adding it to an Arraylist where it stores the token objects.
 
-### LineTokenizer.java
+#### LineTokenizer.java
 
 This java class does most of the work in the lexer package as it is what converts and adds the tokens for each
 line. It basically just searches for any single character tokens then looks for a literal or identifier then
@@ -51,3 +51,12 @@ switch(stringA) { // checks for two character tokens
 ```
 
 ### Parser
+
+#### MainParser.java
+
+This is the main part of the parser which handles parsing the tokens into an AST that the evaluator can evaluate.
+It is a top-down recursive descent parser with a one token lookahead. This means parsing starts at the program
+and then breaks down into to smaller pieces and with a one token lookahead it looks at the next token to make a
+decision. It represents each node with a class that is implemented from an AST package which holds the interfaces
+for all the other node classes in the parser package.
+
