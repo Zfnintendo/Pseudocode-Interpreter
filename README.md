@@ -20,15 +20,24 @@ in an Arraylist.
 ```
 Scanner scanner = new Scanner(this.file);
 
-        int i = 0;
-        while (scanner.hasNextLine()) {
-            LineTokenizer lineTokenizer = new LineTokenizer(scanner.nextLine(), i);
-            this.lexedLine.addAll( lineTokenizer.tokenize() ); // adding it to the lexedLine the line that we lexed!
-            i++;
-        }
+int i = 0;
+while (scanner.hasNextLine()) {
+    LineTokenizer lineTokenizer = new LineTokenizer(scanner.nextLine(), i);
+    this.lexedLine.addAll( lineTokenizer.tokenize() ); // adding it to the lexedLine the line that we lexed!
+    i++;
+}
 ```
 As seen in this code as shown above ^ this simply creates a scanner instance and has that scanner iterate line by
 line and tokenize each line then adding it to an Arraylist where it stores the token objects.
+<br>
+<br>
+Another thing that the MainLexer.java is responsible for is to add the end of file token to denote when it is the end 
+of the file which stops the parser from parsing later. It is implemented like so;
+```
+AddToken addToken = new AddToken();
+TokenLocation tokenLocation = new TokenLocation(i,0);
+Token token = new Token(TokenType.control, "EndOfFile", tokenLocation);
+```
 
 #### LineTokenizer.java
 
@@ -42,13 +51,16 @@ to the correct tokens. Here is an example of what this would look like;
 
 ```
 switch(stringA) { // checks for two character tokens
-                case "<-": {
-                    Token token = new Token(TokenType.operator, "<-", tokenLocation);
-                    addToken.addToLine(token, TokenEnums.assignment);
-                    i++; // we skip the next iteration as thats basically the same token
-                    break;
-                }
+    case "<-": {
+        Token token = new Token(TokenType.operator, "<-", tokenLocation);
+        addToken.addToLine(token, TokenEnums.assignment);
+        i++; // we skip the next iteration as thats basically the same token
+        break;
+    }
 ```
+
+We essentially check for each keyword in the language to generate the appropriate token for it and add it to the list
+for that line which we return back later on with the addition of an end of line token. 
 
 ### Parser
 
@@ -60,6 +72,7 @@ and then breaks down into to smaller pieces and with a one token lookahead it lo
 decision. It represents each node with a class that is implemented from an AST package which holds the interfaces
 for all the other node classes in the parser package. An example of how a node class would be structured would be
 like so; 
+
 ```
 public class Assignment implements ast.Assignment {
 
@@ -88,5 +101,6 @@ public class Assignment implements ast.Assignment {
 
 }
 ```
+
 Essentially we implement an interface from the AST, matching the class. Each class would usually have a kind which 
 returns its NodeType.
