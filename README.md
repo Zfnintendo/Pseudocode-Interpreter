@@ -58,5 +58,35 @@ This is the main part of the parser which handles parsing the tokens into an AST
 It is a top-down recursive descent parser with a one token lookahead. This means parsing starts at the program
 and then breaks down into to smaller pieces and with a one token lookahead it looks at the next token to make a
 decision. It represents each node with a class that is implemented from an AST package which holds the interfaces
-for all the other node classes in the parser package.
+for all the other node classes in the parser package. An example of how a node class would be structured would be
+like so; 
+```
+public class Assignment implements ast.Assignment {
 
+    private final Assignable target;
+    private final Expression value;
+
+    public Assignment(Assignable target, Expression value) {
+        this.target = target;
+        this.value = value;
+    }
+
+    @Override
+    public NodeType kind() {
+        return NodeType.assignment;
+    }
+
+    @Override
+    public Assignable target() {
+        return this.target;
+    }
+
+    @Override
+    public Expression value() {
+        return this.value;
+    }
+
+}
+```
+Essentially we implement an interface from the AST, matching the class. Each class would usually have a kind which 
+returns its NodeType.
