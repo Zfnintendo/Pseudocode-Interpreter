@@ -17,7 +17,7 @@ What MainLexer does is that it scans line by line and creates a new instance of 
 of LineTokenizer it feeds a new line into it and at the end it gets a full table of tokens as we add them all up 
 in an Arraylist.
 
-```
+```java 
 Scanner scanner = new Scanner(this.file);
 
 int i = 0;
@@ -33,7 +33,7 @@ line and tokenize each line then adding it to an Arraylist where it stores the t
 <br>
 Another thing that the MainLexer.java is responsible for is to add the end of file token to denote when it is the end 
 of the file which stops the parser from parsing later. It is implemented like so;
-```
+```java 
 AddToken addToken = new AddToken();
 TokenLocation tokenLocation = new TokenLocation(i,0);
 Token token = new Token(TokenType.control, "EndOfFile", tokenLocation);
@@ -49,7 +49,7 @@ all summed up and added to one big list later on in MainLexer.java.
 Each unique non identifier token is created by using a switch statement in which it matches the correct keywords
 to the correct tokens. Here is an example of what this would look like;
 
-```
+```java
 switch(stringA) { // checks for two character tokens
     case "<-": {
         Token token = new Token(TokenType.operator, "<-", tokenLocation);
@@ -73,7 +73,7 @@ decision. It represents each node with a class that is implemented from an AST p
 for all the other node classes in the parser package. An example of how a node class would be structured would be
 like so; 
 
-```
+```java 
 public class Assignment implements ast.Assignment {
 
     private final Assignable target;
