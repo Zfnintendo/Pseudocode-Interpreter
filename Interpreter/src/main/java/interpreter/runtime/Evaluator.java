@@ -1,9 +1,6 @@
 package interpreter.runtime;
 
-import interpreter.values.ValueType;
-import interpreter.values.RuntimeValue;
-import interpreter.values.NumberValue;
-
+import interpreter.values.*;
 import ast.*;
 
 public class Evaluator {
@@ -38,7 +35,13 @@ public class Evaluator {
     }
 
     public static RuntimeValue evaluateProgram(Program program) {
-        RuntimeValue lastEvaluated = new RuntimeValue
+        RuntimeValue lastEvaluated = new NullValue();
+
+        for (Statement statement : program.body()) {
+            lastEvaluated = evaluate(statement);
+        }
+
+        return lastEvaluated;
     }
 
 }
