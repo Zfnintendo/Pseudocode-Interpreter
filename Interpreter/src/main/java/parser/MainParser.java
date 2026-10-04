@@ -1,5 +1,3 @@
-// ref https://youtu.be/aAvL2BTHf60?si=CxFZhF8YefAWDy3R
-
 // reminder on what all these things do oh my god
 // tokens.get() gets i tokenObject in the list
 // tokens.removeFirst() removes the first thing in the list and shifts
