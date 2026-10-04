@@ -92,7 +92,7 @@ for that line which we return back later on with the addition of an end of line 
 
 #### MainParser.java
 
-This is the main part of the parser which handles parsing the tokens into an AST that the evaluator can evaluate.
+This is the main part of the parser which handles parsing the tokens into an AST that the interpreter can evaluate.
 It is a top-down recursive descent parser with a one token lookahead. This means parsing starts at the program
 and then breaks down into to smaller pieces and with a one token lookahead it looks at the next token to make a
 decision. It represents each node with a class that is implemented from an AST package which holds the interfaces

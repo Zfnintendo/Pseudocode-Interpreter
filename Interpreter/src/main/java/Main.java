@@ -2,7 +2,7 @@ import reader.MainReader;
 import lexer.MainLexer;
 import parser.MainParser;
 import parser.Program;
-import evaluator.AstPrinter;
+import interpreter.AstPrinter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
