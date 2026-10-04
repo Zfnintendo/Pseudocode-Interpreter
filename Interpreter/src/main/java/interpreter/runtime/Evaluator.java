@@ -30,10 +30,6 @@ public class Evaluator {
 
     }
 
-    public static RuntimeValue evaluateBinaryExpression(BinaryExpression binop) {
-
-    }
-
     public static RuntimeValue evaluateProgram(Program program) {
         RuntimeValue lastEvaluated = new NullValue();
 
@@ -42,6 +38,41 @@ public class Evaluator {
         }
 
         return lastEvaluated;
+    }
+
+    public static RuntimeValue evaluateBinaryExpression(BinaryExpression binop) {
+        RuntimeValue lhs = evaluate(binop.LHS());
+        RuntimeValue rhs = evaluate(binop.RHS());
+
+        if (lhs.type() == ValueType.number && rhs.type() == ValueType.number) {
+            NumberValue left = (NumberValue) lhs;
+            NumberValue right = (NumberValue) rhs;
+
+            return evaluateNumericBinaryExpression(left, right, binop.operator());
+        }
+
+        return new NullValue();
+
+    }
+
+    public static NumberValue evaluateNumericBinaryExpression(NumberValue lhs, NumberValue rhs, String operator) {
+        double result = switch(operator) {
+            case "+" -> lhs.value() + rhs.value();
+            case "-" -> lhs.value() - rhs.value();
+            case "*" -> lhs.value() * rhs.value();
+            case "/" -> {
+                if (rhs.value() == 0.0) {
+                    throw new ArithmeticException("Division by zero is not possible.");
+                }
+
+                yield lhs.value() / rhs.value();
+            }
+            case "^" -> Math.pow(lhs.value(), rhs.value());
+
+            default -> throw new UnsupportedOperationException("Operator can not be implemeneted into evaluator." + operator);
+        };
+
+        return new NumberValue(result);
     }
 
 }
