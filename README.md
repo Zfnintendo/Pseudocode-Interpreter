@@ -1,8 +1,34 @@
 # Pseudocode-Interpreter
 ## Made by Zeftarium!
-<br>
-<br>
 This is an interpreter for a language that is based off the CAIE syllabus syntax for their pseudocode.
+
+## Disclaimer
+
+This is an independent educational project implementing a language inspired
+by Cambridge IGCSE pseudocode. It is not affiliated with, endorsed by,
+sponsored by, or approved by Cambridge International Education (CAIE).
+References to Cambridge and its syllabus identify the intended syntax
+reference only.
+
+This interpreter is not an official syntax validator, marking tool, or
+assessment authority. Its behaviour may differ from the syllabus or contain
+errors. Acceptance or rejection of a program does not determine whether an
+exam answer is correct, would receive marks, or meets a grade threshold.
+Consult the relevant official syllabus, examination materials, and mark
+schemes for assessment guidance.
+
+The software is provided “as is”, without warranties of any kind, to the
+extent permitted by applicable law. No guarantee is made regarding its
+accuracy, reliability, suitability for any purpose, or educational outcomes.
+You use the software and rely on its results at your own risk.
+
+To the extent permitted by applicable law, and except as otherwise agreed
+in writing, the authors and contributors disclaim liability for loss or
+damage arising from use of, inability to use, or reliance on the software.
+
+See [LICENSE](LICENSE), particularly sections 15–17, for the applicable
+warranty disclaimer and limitation of liability. This notice summarises
+those provisions and does not replace or modify the licence.
 
 ### Lexer
 
