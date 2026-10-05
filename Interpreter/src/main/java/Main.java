@@ -10,12 +10,10 @@ import java.util.ArrayList;
 
 public class Main {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException { // main function for interpreting
         System.out.println("Pseudocode Interpreter made by Zeftarium!");
 
         /* todo
-            - make a lexer CHECK
-            - make a parser ?
             - make the interpreter
             - WORK ON README FOR DOCUMENTATION PURPOSES!
          */

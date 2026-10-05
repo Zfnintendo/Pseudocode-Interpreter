@@ -51,7 +51,7 @@ public class Evaluator {
             return evaluateNumericBinaryExpression(left, right, binop.operator());
         }
 
-        return new NullValue();
+        throw new IllegalArgumentException("Operator '" + binop.operator() + "' does not support " + lhs.type() + " and " + rhs.type());
 
     }
 
