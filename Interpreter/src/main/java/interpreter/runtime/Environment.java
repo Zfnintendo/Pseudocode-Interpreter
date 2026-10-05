@@ -53,6 +53,14 @@ public class Environment {
         return entry.value();
     }
 
+    public void assign(String name, RuntimeValue value) {
+        VariableEntry entry = this.lookup(name);
 
+        if (entry.isConstant()) {
+            throw new IllegalStateException("Can not reassign a constant: " + name);
+        }
+
+        entry.assign(value);
+    }
 
 }

@@ -7,42 +7,70 @@ public class Evaluator {
 
     public Evaluator() {}
 
-    public static RuntimeValue evaluate(Statement astNode) {
+    public static RuntimeValue evaluate(Statement astNode, Environment environment) {
 
-        switch(astNode.kind()) {
-            case NodeType.program: {
-                return evaluateProgram( (Program) astNode );
-            }
-            case NodeType.numericLiteral: {
+        return switch(astNode.kind()) {
+            case NodeType.program -> evaluateProgram( (Program) astNode, environment);
 
-                ast.NumericLiteral literal = (ast.NumericLiteral) astNode;
+            case NodeType.numericLiteral -> {
+                NumericLiteral literal = (NumericLiteral) astNode;
                 double n = Double.parseDouble(literal.value());
-                return new NumberValue(n);
+                yield new NumberValue(n);
+            }
 
+            case NodeType.binaryExpression -> evaluateBinaryExpression( (BinaryExpression) astNode, environment);
+
+            case NodeType.variableDeclaration -> {
+                VariableDeclaration declaration = (VariableDeclaration) astNode;
+
+                if (!(declaration.declaredType() instanceof ScalarType type)
+                        || (type.tokenType() != lexer.TokenEnums.typeInteger
+                        && type.tokenType() != lexer.TokenEnums.typeReal)) {
+                    throw new UnsupportedOperationException("Only numeric scalar declarations are supported yet.");
+                }
+
+                environment.declareVariable(declaration.name(), declaration.declaredType());
+
+                yield new NullValue();
             }
-            case NodeType.binaryExpression: {
-                return evaluateBinaryExpression( (BinaryExpression) astNode );
+
+            case NodeType.identifier -> {
+                Identifier identifier = (Identifier) astNode;
+                yield environment.read(identifier.symbol());
             }
-            default: {
-                throw new UnsupportedOperationException("This AST node has not been set up for interpretation: " + astNode);
+
+            case NodeType.assignment -> {
+                Assignment assignment = (Assignment) astNode;
+
+                if (!(assignment.target() instanceof Identifier target)) {
+                    throw new UnsupportedOperationException("Array assignment is not implmented yet.");
+                }
+
+                RuntimeValue value = evaluate(assignment.value(), environment);
+
+                environment.assign(target.symbol(), value);
+
+                yield new NullValue();
             }
-        }
+
+            default -> throw new UnsupportedOperationException("This AST node has not been set up for interpretation: " + astNode.kind());
+        };
 
     }
 
-    public static RuntimeValue evaluateProgram(Program program) {
+    public static RuntimeValue evaluateProgram(Program program, Environment environment) {
         RuntimeValue lastEvaluated = new NullValue();
 
         for (Statement statement : program.body()) {
-            lastEvaluated = evaluate(statement);
+            lastEvaluated = evaluate(statement, environment);
         }
 
         return lastEvaluated;
     }
 
-    public static RuntimeValue evaluateBinaryExpression(BinaryExpression binop) {
-        RuntimeValue lhs = evaluate(binop.LHS());
-        RuntimeValue rhs = evaluate(binop.RHS());
+    public static RuntimeValue evaluateBinaryExpression(BinaryExpression binop, Environment environment) {
+        RuntimeValue lhs = evaluate(binop.LHS(), environment);
+        RuntimeValue rhs = evaluate(binop.RHS(), environment);
 
         if (lhs.type() == ValueType.number && rhs.type() == ValueType.number) {
             NumberValue left = (NumberValue) lhs;

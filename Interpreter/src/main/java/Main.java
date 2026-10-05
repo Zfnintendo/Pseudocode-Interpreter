@@ -1,8 +1,14 @@
 import reader.MainReader;
+
 import lexer.MainLexer;
+
 import parser.MainParser;
 import parser.Program;
+
 import interpreter.AstPrinter;
+import interpreter.runtime.Environment;
+import interpreter.runtime.Evaluator;
+import interpreter.values.NumberValue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,6 +50,13 @@ public class Main {
 
             AstPrinter.printTree(abstractSyntaxTree);
 
+            Environment env = new Environment();
+
+            Evaluator.evaluate(abstractSyntaxTree, env);
+
+            NumberValue result = (NumberValue) env.read("Result");
+
+            System.out.println(result.value());
 
 
 
