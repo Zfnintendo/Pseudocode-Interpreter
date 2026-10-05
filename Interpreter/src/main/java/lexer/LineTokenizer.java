@@ -157,13 +157,51 @@ public class LineTokenizer {
                     break;
                 }
                 case '<': {
-                    Token token = new Token(TokenType.operator, "<", tokenLocation);
-                    addToken.addToLine(token, TokenEnums.lessThan);
+                    String operator = "<";
+                    TokenEnums type = TokenEnums.lessThan;
+
+                    if (i + 1 < this.line.length()) {
+                        char next = this.line.charAt(i + 1);
+
+                        switch (next) {
+                            case '-' -> {
+                                operator = "<-";
+                                type = TokenEnums.assignment;
+                                i++;
+                            }
+                            case '=' -> {
+                                operator = "<=";
+                                type = TokenEnums.lessEqualTo;
+                                i++;
+                            }
+                            case '>' -> {
+                                operator = "<>";
+                                type = TokenEnums.notEqualTo;
+                                i++;
+                            }
+                        }
+                    }
+
+                    Token token = new Token(TokenType.operator, operator, tokenLocation);
+
+                    addToken.addToLine(token, type);
+
                     break;
                 }
                 case '>': {
-                    Token token = new Token(TokenType.operator, ">", tokenLocation);
-                    addToken.addToLine(token, TokenEnums.greaterThan);
+                    String operator = ">";
+                    TokenEnums type = TokenEnums.greaterThan;
+
+                    if (i + 1 < this.line.length() && this.line.charAt(i + 1) == '=') {
+                        operator = ">=";
+                        type = TokenEnums.greaterEqualTo;
+                        i++;
+                    }
+
+                    Token token = new Token(TokenType.operator, operator, tokenLocation);
+
+                    addToken.addToLine(token, type);
+
                     break;
                 }
                 case '(': {
@@ -341,33 +379,9 @@ public class LineTokenizer {
             String stringA = String.valueOf(new char[]{c0, c1});
 
             switch(stringA) { // checks for two character tokens
-                case "<-": {
-                    Token token = new Token(TokenType.operator, "<-", tokenLocation);
-                    addToken.addToLine(token, TokenEnums.assignment);
-                    i++; // we skip the next iteration as thats basically the same token
-                    break;
-                }
                 case "OR": {
                     Token token = new Token(TokenType.operator, "OR", tokenLocation);
                     addToken.addToLine(token, TokenEnums.or);
-                    i++;
-                    break;
-                }
-                case "<=": {
-                    Token token = new Token(TokenType.operator, "<=", tokenLocation);
-                    addToken.addToLine(token, TokenEnums.lessEqualTo);
-                    i++;
-                    break;
-                }
-                case ">=": {
-                    Token token = new Token(TokenType.operator, ">=", tokenLocation);
-                    addToken.addToLine(token, TokenEnums.greaterEqualTo);
-                    i++;
-                    break;
-                }
-                case "<>": {
-                    Token token = new Token(TokenType.operator, "<>", tokenLocation);
-                    addToken.addToLine(token, TokenEnums.notEqualTo);
                     i++;
                     break;
                 }
