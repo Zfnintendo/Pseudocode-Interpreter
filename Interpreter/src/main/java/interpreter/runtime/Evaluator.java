@@ -89,8 +89,8 @@ public class Evaluator {
         RuntimeValue rhs = evaluate(binop.RHS(), environment);
 
         if (binop.operator().equals("&")) {
-            if (lhs instanceof StringValue(String value) && rhs instanceof StringValue(String value1)) {
-                return new StringValue(value + value1);
+            if (lhs instanceof StringValue(String leftText) && rhs instanceof StringValue(String rightText)) {
+                return new StringValue(leftText + rightText);
             }
 
             throw new IllegalArgumentException("Concatenation requires two STRING values.");

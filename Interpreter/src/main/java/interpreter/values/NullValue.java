@@ -1,13 +1,8 @@
 package interpreter.values;
 
-public class NullValue implements RuntimeValue {
-
+public record NullValue() implements RuntimeValue {
+    @Override
     public ValueType type() {
         return ValueType.nullValue;
     }
-
-    public String value() {
-        return null;
-    }
-
 }
