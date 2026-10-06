@@ -53,6 +53,8 @@ public class Evaluator {
                 yield new NullValue();
             }
 
+            case NodeType.output -> evaluateOutput( (Output) astNode, environment );
+
             default -> throw new UnsupportedOperationException("This AST node has not been set up for interpretation: " + astNode.kind());
         };
 
@@ -101,6 +103,25 @@ public class Evaluator {
         };
 
         return new NumberValue(result);
+    }
+
+    public static RuntimeValue evaluateOutput(Output output, Environment environment) {
+        StringBuilder line = new StringBuilder();
+
+        for (Expression expression : output.values()) {
+            RuntimeValue value = evaluate(expression, environment);
+
+            if (value instanceof NumberValue number) {
+                line.append(number.value());
+            } else {
+                throw new UnsupportedOperationException("Output formatting not implemented for: " + value.type());
+            }
+        }
+
+        System.out.println(line);
+
+        return new NullValue();
+
     }
 
 }

@@ -54,12 +54,6 @@ public class Main {
 
             Evaluator.evaluate(abstractSyntaxTree, env);
 
-            NumberValue result = (NumberValue) env.read("Result");
-
-            System.out.println(result.value());
-
-
-
         } else {
 
             throw new IllegalArgumentException("Only one file may be passed into the interpreter at a time (You can still access files from the pseudocode file)");

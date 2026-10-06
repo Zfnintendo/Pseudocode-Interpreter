@@ -6,10 +6,6 @@ import java.util.Set;
 
 // use this class by creating a new instance of it then calling tokenize to get the table of tokens
 
-/*future todo when not lazy
-          - idk
- */
-
 public class LineTokenizer {
 
     private final String line;
