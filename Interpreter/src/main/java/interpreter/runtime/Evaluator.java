@@ -18,6 +18,20 @@ public class Evaluator {
                 yield new NumberValue(n);
             }
 
+            case NodeType.textLiteral -> {
+                TextLiteral literal = (TextLiteral) astNode;
+
+                yield switch (literal.type()) {
+                    case TextType.string -> new StringValue(literal.value());
+                    case TextType.character -> {
+                        if (literal.value().length() != 1) {
+                            throw new IllegalArgumentException("Character literal must contain one character.");
+                        }
+                        yield new CharValue(literal.value().charAt(0));
+                    }
+                };
+            }
+
             case NodeType.binaryExpression -> evaluateBinaryExpression( (BinaryExpression) astNode, environment);
 
             case NodeType.variableDeclaration -> {
@@ -74,6 +88,14 @@ public class Evaluator {
         RuntimeValue lhs = evaluate(binop.LHS(), environment);
         RuntimeValue rhs = evaluate(binop.RHS(), environment);
 
+        if (binop.operator().equals("&")) {
+            if (lhs instanceof StringValue(String value) && rhs instanceof StringValue(String value1)) {
+                return new StringValue(value + value1);
+            }
+
+            throw new IllegalArgumentException("Concatenation requires two STRING values.");
+        }
+
         if (lhs.type() == ValueType.number && rhs.type() == ValueType.number) {
             NumberValue left = (NumberValue) lhs;
             NumberValue right = (NumberValue) rhs;
@@ -105,17 +127,22 @@ public class Evaluator {
         return new NumberValue(result);
     }
 
+    private static String formatOutput(RuntimeValue value) {
+        return switch(value) {
+            case NumberValue number -> Double.toString(number.value());
+            case StringValue text -> text.value();
+            case CharValue character -> Character.toString(character.value());
+
+            default -> throw new UnsupportedOperationException("Output formatting not implemented for: " + value.type());
+        };
+    }
+
     public static RuntimeValue evaluateOutput(Output output, Environment environment) {
         StringBuilder line = new StringBuilder();
 
         for (Expression expression : output.values()) {
             RuntimeValue value = evaluate(expression, environment);
-
-            if (value instanceof NumberValue number) {
-                line.append(number.value());
-            } else {
-                throw new UnsupportedOperationException("Output formatting not implemented for: " + value.type());
-            }
+            line.append(formatOutput(value));
         }
 
         System.out.println(line);
