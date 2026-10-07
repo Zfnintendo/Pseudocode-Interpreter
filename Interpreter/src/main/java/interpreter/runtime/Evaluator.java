@@ -111,33 +111,39 @@ public class Evaluator {
 
     }
 
-    public static NumberValue evaluateNumericBinaryExpression(NumberValue lhs, NumberValue rhs, String operator) {
-        double result = switch(operator) {
-            case "+" -> lhs.value() + rhs.value();
-            case "-" -> lhs.value() - rhs.value();
-            case "*" -> lhs.value() * rhs.value();
+    public static RuntimeValue evaluateNumericBinaryExpression(NumberValue lhs, NumberValue rhs, String operator) {
+        return switch(operator) {
+            case "+" -> new NumberValue(lhs.value() + rhs.value());
+            case "-" -> new NumberValue(lhs.value() - rhs.value());
+            case "*" -> new NumberValue(lhs.value() * rhs.value());
             case "/" -> {
                 if (rhs.value() == 0.0) {
                     throw new ArithmeticException("Division by zero is not possible.");
                 }
 
-                yield lhs.value() / rhs.value();
+                yield new NumberValue(lhs.value() / rhs.value());
             }
-            case "^" -> Math.pow(lhs.value(), rhs.value());
+            case "^" -> new NumberValue(Math.pow(lhs.value(), rhs.value()));
+
+            case "=" -> new BooleanValue(lhs.value() == rhs.value());
+            case "<>" -> new BooleanValue(lhs.value() != rhs.value());
+            case "<" -> new BooleanValue(lhs.value() < rhs.value());
+            case "<=" -> new BooleanValue(lhs.value() <= rhs.value());
+            case ">" -> new BooleanValue(lhs.value() > rhs.value());
+            case ">=" -> new BooleanValue(lhs.value() >= rhs.value());
 
             default -> throw new UnsupportedOperationException("Operator can not be implemeneted into evaluator." + operator);
         };
-
-        return new NumberValue(result);
     }
 
     public static RuntimeValue evaluateUnaryExpression(UnaryExpression expression, Environment environment) {
         RuntimeValue operand = evaluate(expression.operand(), environment);
 
         if (expression.operator().equals("NOT")) {
-            if (!(operand instanceof BooleanValue bool)) {
+            if (!(operand instanceof BooleanValue(boolean value))) {
                 throw new IllegalArgumentException("Unary Operator 'NOT' requires a boolean");
             }
+            return new BooleanValue(!value);
         }
 
         if (!(operand instanceof NumberValue(double value))) {
