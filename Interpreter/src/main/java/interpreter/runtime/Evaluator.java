@@ -33,6 +33,7 @@ public class Evaluator {
             }
 
             case NodeType.binaryExpression -> evaluateBinaryExpression( (BinaryExpression) astNode, environment);
+            case NodeType.unaryExpression -> evaluateUnaryExpression( (UnaryExpression) astNode, environment);
 
             case NodeType.variableDeclaration -> {
                 VariableDeclaration declaration = (VariableDeclaration) astNode;
@@ -125,6 +126,21 @@ public class Evaluator {
         };
 
         return new NumberValue(result);
+    }
+
+    public static RuntimeValue evaluateUnaryExpression(UnaryExpression expression, Environment environment) {
+        RuntimeValue operand = evaluate(expression.operand(), environment);
+
+        if (!(operand instanceof NumberValue number)) {
+            throw new IllegalArgumentException("Unary operator '" + expression.operator() + "' requires a number.");
+        }
+
+        return switch(expression.operator()) {
+          case "+" -> new NumberValue(number.value());
+          case "-" -> new NumberValue(-number.value());
+          default -> throw new UnsupportedOperationException("Unsupported unary operator: " + expression.operator());
+        };
+
     }
 
     private static String formatOutput(RuntimeValue value) {

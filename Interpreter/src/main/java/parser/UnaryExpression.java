@@ -20,7 +20,7 @@ public class UnaryExpression implements ast.UnaryExpression {
 
     @Override
     public String operator() {
-        return this.operator();
+        return this.operator;
     }
 
     @Override
