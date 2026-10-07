@@ -17,7 +17,6 @@ public class Evaluator {
                 double n = Double.parseDouble(literal.value());
                 yield new NumberValue(n);
             }
-
             case NodeType.textLiteral -> {
                 TextLiteral literal = (TextLiteral) astNode;
 
@@ -31,6 +30,10 @@ public class Evaluator {
                     }
                 };
             }
+            case NodeType.booleanLiteral -> {
+                BooleanLiteral literal = (BooleanLiteral) astNode;
+                yield new BooleanValue(literal.value());
+            }
 
             case NodeType.binaryExpression -> evaluateBinaryExpression( (BinaryExpression) astNode, environment);
             case NodeType.unaryExpression -> evaluateUnaryExpression( (UnaryExpression) astNode, environment);
@@ -38,9 +41,9 @@ public class Evaluator {
             case NodeType.variableDeclaration -> {
                 VariableDeclaration declaration = (VariableDeclaration) astNode;
 
-                if (!(declaration.declaredType() instanceof ScalarType type)
-                        || (type.tokenType() != lexer.TokenEnums.typeInteger
-                        && type.tokenType() != lexer.TokenEnums.typeReal)) {
+                if (!(declaration.declaredType() instanceof ScalarType(lexer.TokenEnums tokenType))
+                        || (tokenType != lexer.TokenEnums.typeInteger
+                        && tokenType != lexer.TokenEnums.typeReal)) {
                     throw new UnsupportedOperationException("Only numeric scalar declarations are supported yet.");
                 }
 
@@ -131,13 +134,19 @@ public class Evaluator {
     public static RuntimeValue evaluateUnaryExpression(UnaryExpression expression, Environment environment) {
         RuntimeValue operand = evaluate(expression.operand(), environment);
 
-        if (!(operand instanceof NumberValue number)) {
+        if (expression.operator().equals("NOT")) {
+            if (!(operand instanceof BooleanValue bool)) {
+                throw new IllegalArgumentException("Unary Operator 'NOT' requires a boolean");
+            }
+        }
+
+        if (!(operand instanceof NumberValue(double value))) {
             throw new IllegalArgumentException("Unary operator '" + expression.operator() + "' requires a number.");
         }
 
         return switch(expression.operator()) {
-          case "+" -> new NumberValue(number.value());
-          case "-" -> new NumberValue(-number.value());
+          case "+" -> new NumberValue(value);
+          case "-" -> new NumberValue(-value);
           default -> throw new UnsupportedOperationException("Unsupported unary operator: " + expression.operator());
         };
 
@@ -148,6 +157,7 @@ public class Evaluator {
             case NumberValue number -> Double.toString(number.value());
             case StringValue text -> text.value();
             case CharValue character -> Character.toString(character.value());
+            case BooleanValue bool -> bool.value() ? "TRUE" : "FALSE";
 
             default -> throw new UnsupportedOperationException("Output formatting not implemented for: " + value.type());
         };
