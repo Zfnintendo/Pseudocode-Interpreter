@@ -41,6 +41,7 @@ public class Evaluator {
             case NodeType.ifStatement -> evaluateIfStatement( (IfStatement) astNode, environment);
             case NodeType.whileStatement -> evaluateWhileStatement( (WhileStatement) astNode, environment);
             case NodeType.repeatStatement -> evaluateRepeatStatement( (RepeatStatement) astNode, environment);
+            case NodeType.forStatement -> evaluateForStatement( (ForStatement) astNode, environment);
 
             case NodeType.variableDeclaration -> {
                 VariableDeclaration declaration = (VariableDeclaration) astNode;
@@ -265,6 +266,40 @@ public class Evaluator {
                 break;
             }
 
+        }
+
+        return new NullValue();
+
+    }
+
+    public static RuntimeValue evaluateForStatement(ForStatement statement, Environment environment) {
+
+        RuntimeValue startValue = evaluate(statement.start(), environment);
+        RuntimeValue endValue = evaluate(statement.end(), environment);
+        RuntimeValue stepValue = evaluate(statement.step(), environment);
+
+        if (!(startValue instanceof NumberValue(double start))
+                || !(endValue instanceof NumberValue(double end))
+                || !(stepValue instanceof NumberValue(double step))) {
+            throw new IllegalArgumentException("FOR start, end and step must be numbers.");
+        }
+
+        if (!Double.isFinite(start) || !Double.isFinite(end) || !Double.isFinite(step) || step == 0.0) {
+            throw new IllegalArgumentException("FOR bounds and step must be finite and step must not be 0.");
+        }
+
+        String variableName = statement.variable().symbol();
+        double counter = start;
+
+        environment.assign(variableName, new NumberValue(counter));
+
+        while (step > 0 ? counter <= end : counter >= end) {
+            for (Statement bodyStatement : statement.body()) {
+                evaluate(bodyStatement, environment);
+            }
+
+            counter += step;
+            environment.assign(variableName, new NumberValue(counter));
         }
 
         return new NullValue();
