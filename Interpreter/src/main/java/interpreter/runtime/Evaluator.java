@@ -38,6 +38,8 @@ public class Evaluator {
             case NodeType.binaryExpression -> evaluateBinaryExpression( (BinaryExpression) astNode, environment);
             case NodeType.unaryExpression -> evaluateUnaryExpression( (UnaryExpression) astNode, environment);
 
+            case NodeType.ifStatement -> evaluateIfStatement( (IfStatement) astNode, environment);
+
             case NodeType.variableDeclaration -> {
                 VariableDeclaration declaration = (VariableDeclaration) astNode;
 
@@ -204,6 +206,22 @@ public class Evaluator {
 
         return new NullValue();
 
+    }
+
+    public static RuntimeValue evaluateIfStatement(IfStatement statement, Environment environment) {
+        RuntimeValue condition = evaluate(statement.condition(), environment);
+
+        if (!(condition instanceof BooleanValue(boolean result))) {
+            throw new IllegalArgumentException("IF condition must be a boolean.");
+        }
+
+        var body = result ? statement.thenBody() : statement.elseBody();
+
+        for (Statement bodyStatement : body) {
+            evaluate(bodyStatement, environment);
+        }
+
+        return new NullValue();
     }
 
 }
