@@ -241,9 +241,9 @@ public class Evaluator {
             for (Statement bodyStatement : statement.body()) {
                 evaluate(bodyStatement, environment);
             }
-
-            return new NullValue();
         }
+
+        return new NullValue();
 
     }
 
