@@ -39,6 +39,7 @@ public class Evaluator {
             case NodeType.unaryExpression -> evaluateUnaryExpression( (UnaryExpression) astNode, environment);
 
             case NodeType.ifStatement -> evaluateIfStatement( (IfStatement) astNode, environment);
+            case NodeType.whileStatement -> evaluateWhileStatement( (WhileStatement) astNode, environment);
 
             case NodeType.variableDeclaration -> {
                 VariableDeclaration declaration = (VariableDeclaration) astNode;
@@ -222,6 +223,28 @@ public class Evaluator {
         }
 
         return new NullValue();
+    }
+
+    public static RuntimeValue evaluateWhileStatement(WhileStatement statement, Environment environment) {
+
+        while (true) {
+            RuntimeValue condition = evaluate(statement.condition(), environment);
+
+            if (!(condition instanceof BooleanValue(boolean result))) {
+                throw new IllegalArgumentException("WHILE condition must be a boolean.");
+            }
+
+            if (!result) {
+                break;
+            }
+
+            for (Statement bodyStatement : statement.body()) {
+                evaluate(bodyStatement, environment);
+            }
+
+            return new NullValue();
+        }
+
     }
 
 }
