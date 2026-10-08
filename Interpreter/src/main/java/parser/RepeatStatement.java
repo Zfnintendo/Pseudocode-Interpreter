@@ -28,6 +28,6 @@ public class RepeatStatement implements ast.RepeatStatement {
 
     @Override
     public Expression condition() {
-        return this.condition();
+        return this.condition;
     }
 }

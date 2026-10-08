@@ -40,6 +40,7 @@ public class Evaluator {
 
             case NodeType.ifStatement -> evaluateIfStatement( (IfStatement) astNode, environment);
             case NodeType.whileStatement -> evaluateWhileStatement( (WhileStatement) astNode, environment);
+            case NodeType.repeatStatement -> evaluateRepeatStatement( (RepeatStatement) astNode, environment);
 
             case NodeType.variableDeclaration -> {
                 VariableDeclaration declaration = (VariableDeclaration) astNode;
@@ -241,6 +242,29 @@ public class Evaluator {
             for (Statement bodyStatement : statement.body()) {
                 evaluate(bodyStatement, environment);
             }
+        }
+
+        return new NullValue();
+
+    }
+
+    public static RuntimeValue evaluateRepeatStatement(RepeatStatement statement, Environment environment) {
+
+        while (true) {
+            for (Statement bodyStatement : statement.body()) {
+                evaluate(bodyStatement, environment);
+            }
+
+            RuntimeValue condition = evaluate(statement.condition(), environment);
+
+            if (!(condition instanceof BooleanValue(boolean result))) {
+                throw new IllegalArgumentException("UNTIL condition must be a boolean.");
+            }
+
+            if (result) {
+                break;
+            }
+
         }
 
         return new NullValue();
