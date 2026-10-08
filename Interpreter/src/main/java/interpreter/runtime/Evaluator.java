@@ -90,6 +90,29 @@ public class Evaluator {
 
     public static RuntimeValue evaluateBinaryExpression(BinaryExpression binop, Environment environment) {
         RuntimeValue lhs = evaluate(binop.LHS(), environment);
+
+        if (binop.operator().equals("AND") || binop.operator().equals("OR")) {
+            if (!(lhs instanceof BooleanValue(boolean left))) {
+                throw new IllegalArgumentException("Operator '" + binop.operator() + "' requires boolean operands.");
+            }
+
+            if (binop.operator().equals("AND") && !left) {
+                return new BooleanValue(false);
+            }
+
+            if (binop.operator().equals("OR") && left) {
+                return new BooleanValue(true);
+            }
+
+            RuntimeValue rightOperand = evaluate(binop.RHS(), environment);
+
+            if (!(rightOperand instanceof BooleanValue(boolean right))) {
+                throw new IllegalArgumentException("Operator '" + binop.operator() + "' requires boolean operands.");
+            }
+
+            return new BooleanValue(right);
+        }
+
         RuntimeValue rhs = evaluate(binop.RHS(), environment);
 
         if (binop.operator().equals("&")) {
