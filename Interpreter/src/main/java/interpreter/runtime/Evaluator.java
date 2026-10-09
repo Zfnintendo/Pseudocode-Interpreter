@@ -5,6 +5,7 @@ import interpreter.values.*;
 import ast.*;
 
 import java.util.Scanner;
+import java.util.Locale;
 
 public class Evaluator {
 
@@ -49,6 +50,8 @@ public class Evaluator {
             case NodeType.forStatement -> evaluateForStatement( (ForStatement) astNode, environment);
             case NodeType.caseStatement -> evaluateCaseStatement( (CaseStatement) astNode, environment);
 
+            case NodeType.callExpression -> evaluateCallExpression( (CallExpression) astNode, environment);
+
             case NodeType.constantDeclaration -> evaluateConstantDeclaration( (ConstantDeclaration) astNode, environment);
             case NodeType.variableDeclaration -> evaluateVariableDeclaration( (VariableDeclaration) astNode, environment);
 
@@ -57,19 +60,7 @@ public class Evaluator {
                 yield environment.read(identifier.symbol());
             }
 
-            case NodeType.assignment -> {
-                Assignment assignment = (Assignment) astNode;
-
-                if (!(assignment.target() instanceof Identifier target)) {
-                    throw new UnsupportedOperationException("Array assignment is not implmented yet.");
-                }
-
-                RuntimeValue value = evaluate(assignment.value(), environment);
-
-                environment.assign(target.symbol(), value);
-
-                yield new NullValue();
-            }
+            case NodeType.assignment -> evaluateAssignment( (Assignment) astNode, environment);
 
             case NodeType.input -> evaluateInput( (Input) astNode, environment);
             case NodeType.output -> evaluateOutput( (Output) astNode, environment );
@@ -459,5 +450,43 @@ public class Evaluator {
         environment.declareConstant(declaration.name(), new ScalarType(tokenType), value);
 
         return new NullValue();
+    }
+
+    public static RuntimeValue evaluateAssignment(Assignment assignment, Environment environment) {
+        if (!(assignment.target() instanceof Identifier target)) {
+            throw new UnsupportedOperationException("Array assignment is not implmented yet.");
+        }
+
+        RuntimeValue value = evaluate(assignment.value(), environment);
+
+        environment.assign(target.symbol(), value);
+
+        return new NullValue();
+    }
+
+    public static RuntimeValue evaluateCallExpression(CallExpression call, Environment environment) {
+        return switch(call.name()) {
+            case "LENGTH", "UCASE", "LCASE" -> {
+                if (call.arguments().size() != 1) {
+                    throw new IllegalArgumentException(call.name() + " requires exactly one argument.");
+                }
+
+                RuntimeValue argument = evaluate(call.arguments().getFirst(), environment);
+
+                if (!(argument instanceof StringValue(String text))) {
+                    throw new IllegalArgumentException(call.name() + " requires a STRING argument.");
+                }
+
+                yield switch(call.name()) {
+                    case "LENGTH" -> new NumberValue(text.length());
+                    case "UCASE" -> new StringValue(text.toUpperCase(Locale.ROOT));
+                    case "LCASE" -> new StringValue(text.toLowerCase(Locale.ROOT));
+
+                    default -> throw new IllegalStateException("Unexpected string function: " + call.name());
+                };
+            }
+
+            default -> throw new UnsupportedOperationException("Function is not implemented: " + call.name());
+        };
     }
 }
