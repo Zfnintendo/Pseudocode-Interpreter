@@ -155,6 +155,28 @@ public class Evaluator {
             case ">" -> new BooleanValue(lhs.value() > rhs.value());
             case ">=" -> new BooleanValue(lhs.value() >= rhs.value());
 
+            case "DIV", "MOD" -> {
+                double left = lhs.value();
+                double right = rhs.value();
+
+                if (!Double.isFinite(left) || !Double.isFinite(right) || left != Math.rint(left) || right != Math.rint(right)) {
+                    throw new IllegalArgumentException(operator + " requires finite integer operands.");
+                }
+
+                if (right == 0.0) {
+                    throw new ArithmeticException(operator + " can not use a zero divisior");
+                }
+
+                if (operator.equals("MOD")) {
+                    yield new NumberValue(left % right);
+                }
+
+                double quotient = left /right;
+                double truncated = quotient < 0 ? Math.ceil(quotient) : Math.floor(quotient);
+
+                yield new NumberValue(truncated);
+            }
+
             default -> throw new UnsupportedOperationException("Operator can not be implemeneted into evaluator." + operator);
         };
     }
