@@ -115,6 +115,24 @@ public class Evaluator {
 
         RuntimeValue rhs = evaluate(binop.RHS(), environment);
 
+        if (binop.operator().equals("=") || binop.operator().equals("<>")) {
+            boolean equal;
+
+            if (lhs instanceof StringValue(String left) && rhs instanceof StringValue(String right)) {
+                equal = left.equals(right);
+            } else if (lhs instanceof CharValue(char left) && rhs instanceof CharValue(char right)) {
+                equal = left == right;
+            } else if (lhs instanceof BooleanValue(boolean left) && rhs instanceof BooleanValue(boolean right)) {
+                equal = left == right;
+            } else if (lhs instanceof NumberValue left && rhs instanceof NumberValue right) {
+                return evaluateNumericBinaryExpression(left, right, binop.operator());
+            } else {
+                throw new IllegalArgumentException("Can not compare " + lhs.type() + " and " + rhs.type());
+            }
+
+            return new BooleanValue(binop.operator().equals("=") == equal);
+        }
+
         if (binop.operator().equals("&")) {
             if (lhs instanceof StringValue(String leftText) && rhs instanceof StringValue(String rightText)) {
                 return new StringValue(leftText + rightText);
@@ -407,9 +425,9 @@ public class Evaluator {
 
                 yield number == Math.rint(number) ? TokenEnums.typeInteger : TokenEnums.typeReal;
             }
-            case StringValue text -> TokenEnums.typeString;
-            case CharValue character -> TokenEnums.typeChar;
-            case BooleanValue bool -> TokenEnums.typeBoolean;
+            case StringValue _ -> TokenEnums.typeString;
+            case CharValue _ -> TokenEnums.typeChar;
+            case BooleanValue _ -> TokenEnums.typeBoolean;
 
             default -> throw new UnsupportedOperationException("Unsupported constant value: " + value.type());
         };
