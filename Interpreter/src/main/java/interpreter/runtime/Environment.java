@@ -63,4 +63,8 @@ public class Environment {
         entry.assign(value);
     }
 
+    public TypeSpecification declaredType(String name) {
+        return this.lookup(name).declaredType();
+    }
+
 }

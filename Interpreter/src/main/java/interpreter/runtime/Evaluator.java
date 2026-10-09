@@ -3,7 +3,11 @@ package interpreter.runtime;
 import interpreter.values.*;
 import ast.*;
 
+import java.util.Scanner;
+
 public class Evaluator {
+
+    private static final Scanner inputScanner = new Scanner(System.in);
 
     public Evaluator() {}
 
@@ -79,6 +83,7 @@ public class Evaluator {
                 yield new NullValue();
             }
 
+            case NodeType.input -> evaluateInput( (Input) astNode, environment);
             case NodeType.output -> evaluateOutput( (Output) astNode, environment );
 
             default -> throw new UnsupportedOperationException("This AST node has not been set up for interpretation: " + astNode.kind());
@@ -212,6 +217,65 @@ public class Evaluator {
 
         return new NullValue();
 
+    }
+
+    public static RuntimeValue evaluateInput(Input input, Environment environment) {
+        if (!(input.target() instanceof Identifier target)) {
+            throw new UnsupportedOperationException("Array input is not implemented yet.");
+        }
+
+        if (!(environment.declaredType(target.symbol()) instanceof ScalarType(lexer.TokenEnums tokenType))) {
+            throw new UnsupportedOperationException("INPUT requires a scalar variable.");
+        }
+
+        if (!inputScanner.hasNextLine()) {
+            throw new IllegalStateException("No more input is available.");
+        }
+
+        String text = inputScanner.nextLine();
+
+        RuntimeValue value = switch(tokenType) {
+            case typeInteger, typeReal -> {
+                double number;
+
+                try {
+                    number = Double.parseDouble(text.trim());
+                } catch(NumberFormatException exception) {
+                    throw new IllegalArgumentException("Expected numeric input, got: " + text, exception);
+                }
+
+                if (!Double.isFinite(number)) {
+                    throw new IllegalArgumentException("Input must be a finite number.");
+                }
+
+                yield new NumberValue(number);
+            }
+            case typeString -> new StringValue(text);
+            case typeChar -> {
+                if (text.length() != 1 ) {
+                    throw new IllegalArgumentException("CHAR input must contain exactly one character.");
+                }
+
+                yield new CharValue(text.charAt(0));
+            }
+            case typeBoolean -> {
+                String booleanText = text.trim();
+
+                if (booleanText.equalsIgnoreCase("TRUE")) {
+                    yield new BooleanValue(true);
+                }
+                if (booleanText.equalsIgnoreCase("FALSE")) {
+                    yield new BooleanValue(false);
+                }
+
+                throw new IllegalArgumentException("BOOLEAN input must be TRUE or FALSE.");
+            }
+
+            default -> throw new UnsupportedOperationException("Unsupported input type: " + tokenType);
+        };
+
+        environment.assign(target.symbol(), value);
+        return new NullValue();
     }
 
     public static RuntimeValue evaluateIfStatement(IfStatement statement, Environment environment) {
