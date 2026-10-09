@@ -47,6 +47,7 @@ public class Evaluator {
             case NodeType.whileStatement -> evaluateWhileStatement( (WhileStatement) astNode, environment);
             case NodeType.repeatStatement -> evaluateRepeatStatement( (RepeatStatement) astNode, environment);
             case NodeType.forStatement -> evaluateForStatement( (ForStatement) astNode, environment);
+            case NodeType.caseStatement -> evaluateCaseStatement( (CaseStatement) astNode, environment);
 
             case NodeType.constantDeclaration -> evaluateConstantDeclaration( (ConstantDeclaration) astNode, environment);
             case NodeType.variableDeclaration -> evaluateVariableDeclaration( (VariableDeclaration) astNode, environment);
@@ -88,6 +89,23 @@ public class Evaluator {
         return lastEvaluated;
     }
 
+    private static boolean valuesEqual(RuntimeValue lhs, RuntimeValue rhs) {
+        if (lhs instanceof NumberValue(double left) && rhs instanceof NumberValue(double right)) {
+            return left == right;
+        }
+        if (lhs instanceof StringValue(String left) && rhs instanceof StringValue(String right)) {
+            return left.equals(right);
+        }
+        if (lhs instanceof CharValue(char left) && rhs instanceof CharValue(char right)) {
+            return left == right;
+        }
+        if (lhs instanceof BooleanValue(boolean left) && rhs instanceof BooleanValue(boolean right)) {
+            return left == right;
+        }
+
+        throw new IllegalArgumentException("Can not compare " + lhs.type() + " and " + rhs.type());
+    }
+
     public static RuntimeValue evaluateBinaryExpression(BinaryExpression binop, Environment environment) {
         RuntimeValue lhs = evaluate(binop.LHS(), environment);
 
@@ -116,20 +134,7 @@ public class Evaluator {
         RuntimeValue rhs = evaluate(binop.RHS(), environment);
 
         if (binop.operator().equals("=") || binop.operator().equals("<>")) {
-            boolean equal;
-
-            if (lhs instanceof StringValue(String left) && rhs instanceof StringValue(String right)) {
-                equal = left.equals(right);
-            } else if (lhs instanceof CharValue(char left) && rhs instanceof CharValue(char right)) {
-                equal = left == right;
-            } else if (lhs instanceof BooleanValue(boolean left) && rhs instanceof BooleanValue(boolean right)) {
-                equal = left == right;
-            } else if (lhs instanceof NumberValue left && rhs instanceof NumberValue right) {
-                return evaluateNumericBinaryExpression(left, right, binop.operator());
-            } else {
-                throw new IllegalArgumentException("Can not compare " + lhs.type() + " and " + rhs.type());
-            }
-
+            boolean equal = valuesEqual(lhs,rhs);
             return new BooleanValue(binop.operator().equals("=") == equal);
         }
 
@@ -398,6 +403,25 @@ public class Evaluator {
 
         return new NullValue();
 
+    }
+
+    public static RuntimeValue evaluateCaseStatement(CaseStatement statement, Environment environment) {
+        RuntimeValue selector = evaluate(statement.selector(), environment);
+
+        for (Cases branch : statement.cases()) {
+            RuntimeValue caseValue = evaluate(branch.value(), environment);
+
+            if (valuesEqual(selector, caseValue)) {
+                evaluate(branch.statement(), environment);
+                return new NullValue();
+            }
+        }
+
+        if (statement.otherwiseCase().isPresent()) {
+            evaluate(statement.otherwiseCase().get(), environment);
+        }
+
+        return new NullValue();
     }
 
     public static RuntimeValue evaluateVariableDeclaration(VariableDeclaration declaration, Environment environment) {
