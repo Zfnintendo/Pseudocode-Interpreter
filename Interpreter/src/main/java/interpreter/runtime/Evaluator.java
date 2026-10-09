@@ -46,15 +46,18 @@ public class Evaluator {
             case NodeType.variableDeclaration -> {
                 VariableDeclaration declaration = (VariableDeclaration) astNode;
 
-                if (!(declaration.declaredType() instanceof ScalarType(lexer.TokenEnums tokenType))
-                        || (tokenType != lexer.TokenEnums.typeInteger
-                        && tokenType != lexer.TokenEnums.typeReal)) {
-                    throw new UnsupportedOperationException("Only numeric scalar declarations are supported yet.");
+                if (!(declaration.declaredType() instanceof ScalarType type)) {
+                    throw new UnsupportedOperationException("Only scalar declarations are supported yet.");
                 }
 
-                environment.declareVariable(declaration.name(), declaration.declaredType());
+                switch (type.tokenType()) {
+                    case typeInteger, typeReal, typeString, typeChar, typeBoolean -> environment.declareVariable(declaration.name(), type);
+
+                    default -> throw new UnsupportedOperationException("Unsupported scalar type: " + type.tokenType());
+                }
 
                 yield new NullValue();
+
             }
 
             case NodeType.identifier -> {

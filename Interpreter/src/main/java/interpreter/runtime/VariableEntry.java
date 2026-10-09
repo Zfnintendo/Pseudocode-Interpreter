@@ -1,7 +1,8 @@
 package interpreter.runtime;
 
 import ast.TypeSpecification;
-import interpreter.values.RuntimeValue;
+import ast.ScalarType;
+import interpreter.values.*;
 import java.util.Objects;
 
 public class VariableEntry {
@@ -20,8 +21,9 @@ public class VariableEntry {
 
     public VariableEntry(TypeSpecification declaredType, RuntimeValue initialValue, boolean constant) {
         this.declaredType = Objects.requireNonNull(declaredType);
-        this.value = Objects.requireNonNull(initialValue);
         this.constant = constant;
+        validateValue(initialValue);
+        this.value = initialValue;
         this.initialised = true;
     }
 
@@ -50,8 +52,31 @@ public class VariableEntry {
             throw new IllegalStateException("Can not assign a new value to a constant.");
         }
 
-        this.value = Objects.requireNonNull(value);
+        validateValue(value);
+        this.value = value;
         this.initialised = true;
+    }
+
+    private void validateValue(RuntimeValue value) {
+        Objects.requireNonNull(value);
+
+        if (!(this.declaredType instanceof ScalarType(lexer.TokenEnums tokenType))) {
+            throw new UnsupportedOperationException("Only scalar assignments are supported yet.");
+        }
+
+        boolean valid = switch (tokenType) {
+            case typeInteger -> value instanceof NumberValue(double value1) && Double.isFinite(value1) && value1 == Math.rint(value1);
+            case typeReal -> value instanceof NumberValue;
+            case typeString -> value instanceof StringValue;
+            case typeChar -> value instanceof CharValue;
+            case typeBoolean -> value instanceof BooleanValue;
+
+            default -> throw new UnsupportedOperationException("Unsupported scalar type: " + tokenType);
+        };
+
+        if (!(valid)) {
+            throw new IllegalArgumentException("Value " + value + " does not match " + tokenType);
+        }
     }
 
 }
