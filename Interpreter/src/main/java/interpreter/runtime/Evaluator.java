@@ -1,5 +1,6 @@
 package interpreter.runtime;
 
+import lexer.TokenEnums;
 import interpreter.values.*;
 import ast.*;
 
@@ -47,22 +48,8 @@ public class Evaluator {
             case NodeType.repeatStatement -> evaluateRepeatStatement( (RepeatStatement) astNode, environment);
             case NodeType.forStatement -> evaluateForStatement( (ForStatement) astNode, environment);
 
-            case NodeType.variableDeclaration -> {
-                VariableDeclaration declaration = (VariableDeclaration) astNode;
-
-                if (!(declaration.declaredType() instanceof ScalarType type)) {
-                    throw new UnsupportedOperationException("Only scalar declarations are supported yet.");
-                }
-
-                switch (type.tokenType()) {
-                    case typeInteger, typeReal, typeString, typeChar, typeBoolean -> environment.declareVariable(declaration.name(), type);
-
-                    default -> throw new UnsupportedOperationException("Unsupported scalar type: " + type.tokenType());
-                }
-
-                yield new NullValue();
-
-            }
+            case NodeType.constantDeclaration -> evaluateConstantDeclaration( (ConstantDeclaration) astNode, environment);
+            case NodeType.variableDeclaration -> evaluateVariableDeclaration( (VariableDeclaration) astNode, environment);
 
             case NodeType.identifier -> {
                 Identifier identifier = (Identifier) astNode;
@@ -235,7 +222,7 @@ public class Evaluator {
         String text = inputScanner.nextLine();
 
         RuntimeValue value = switch(tokenType) {
-            case typeInteger, typeReal -> {
+            case TokenEnums.typeInteger, TokenEnums.typeReal -> {
                 double number;
 
                 try {
@@ -250,15 +237,15 @@ public class Evaluator {
 
                 yield new NumberValue(number);
             }
-            case typeString -> new StringValue(text);
-            case typeChar -> {
+            case TokenEnums.typeString -> new StringValue(text);
+            case TokenEnums.typeChar -> {
                 if (text.length() != 1 ) {
                     throw new IllegalArgumentException("CHAR input must contain exactly one character.");
                 }
 
                 yield new CharValue(text.charAt(0));
             }
-            case typeBoolean -> {
+            case TokenEnums.typeBoolean -> {
                 String booleanText = text.trim();
 
                 if (booleanText.equalsIgnoreCase("TRUE")) {
@@ -373,4 +360,40 @@ public class Evaluator {
 
     }
 
+    public static RuntimeValue evaluateVariableDeclaration(VariableDeclaration declaration, Environment environment) {
+        if (!(declaration.declaredType() instanceof ScalarType type)) {
+            throw new UnsupportedOperationException("Only scalar declarations are supported yet.");
+        }
+
+        switch(type.tokenType()) {
+            case typeInteger,typeReal, typeString, typeChar, typeBoolean -> environment.declareVariable(declaration.name(), type);
+
+            default -> throw new UnsupportedOperationException("Unsupported scalar type: " + type.tokenType());
+        }
+
+        return new NullValue();
+    }
+
+    public static RuntimeValue evaluateConstantDeclaration(ConstantDeclaration declaration, Environment environment) {
+        RuntimeValue value = evaluate(declaration.value(), environment);
+
+        TokenEnums tokenType = switch(value) {
+            case NumberValue(double number) -> {
+                if (!Double.isFinite(number)) {
+                    throw new IllegalArgumentException("Numeric constants must be finite.");
+                }
+
+                yield number == Math.rint(number) ? TokenEnums.typeInteger : TokenEnums.typeReal;
+            }
+            case StringValue text -> TokenEnums.typeString;
+            case CharValue character -> TokenEnums.typeChar;
+            case BooleanValue bool -> TokenEnums.typeBoolean;
+
+            default -> throw new UnsupportedOperationException("Unsupported constant value: " + value.type());
+        };
+
+        environment.declareConstant(declaration.name(), new ScalarType(tokenType), value);
+
+        return new NullValue();
+    }
 }
