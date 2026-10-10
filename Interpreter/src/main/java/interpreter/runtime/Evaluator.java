@@ -485,6 +485,36 @@ public class Evaluator {
                     default -> throw new IllegalStateException("Unexpected string function: " + call.name());
                 };
             }
+            case "SUBSTRING" -> {
+                if (call.arguments().size() != 3) {
+                    throw new IllegalArgumentException("SUBSTRING requires exactly 3 arguments.");
+                }
+
+                RuntimeValue textValue = evaluate(call.arguments().getFirst(), environment);
+                RuntimeValue startValue = evaluate(call.arguments().get(1), environment);
+                RuntimeValue lengthValue = evaluate(call.arguments().get(2), environment);
+
+                if (!(textValue instanceof StringValue(String text))
+                        || !(startValue instanceof NumberValue(double start))
+                        || !(lengthValue instanceof NumberValue(double length))) {
+                    throw new IllegalArgumentException("SUBSTRING requires a STRING followed by two indicies.");
+                }
+
+                if (!Double.isFinite(start) || !Double.isFinite(length) || start != Math.rint(start) || length != Math.rint(length)) {
+                    throw new IllegalArgumentException("SUBSTRING start and length must be finite integers.");
+                }
+
+                double startIndex = start - 1;
+
+                if (startIndex < 0 || startIndex > text.length() || length < 0 || length > text.length() - startIndex) {
+                    throw new IllegalArgumentException("SUBTRING range is outside the string.");
+                }
+
+                int fromIndex = (int) startIndex;
+                int toIndex = fromIndex + (int) length;
+
+                yield new StringValue(text.substring(fromIndex, toIndex));
+            }
 
             default -> throw new UnsupportedOperationException("Function is not implemented: " + call.name());
         };
