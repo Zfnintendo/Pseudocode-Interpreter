@@ -500,17 +500,7 @@ public class Evaluator {
                     throw new IllegalArgumentException("SUBSTRING requires a STRING followed by two indicies.");
                 }
 
-                if (!Double.isFinite(start) || !Double.isFinite(length) || start != Math.rint(start) || length != Math.rint(length)) {
-                    throw new IllegalArgumentException("SUBSTRING start and length must be finite integers.");
-                }
-
-                double startIndex = start - 1;
-
-                if (startIndex < 0 || startIndex > text.length() || length < 0 || length > text.length() - startIndex) {
-                    throw new IllegalArgumentException("SUBTRING range is outside the string.");
-                }
-
-                int fromIndex = (int) startIndex;
+                int fromIndex = getFromIndex(text, start, length);
                 int toIndex = fromIndex + (int) length;
 
                 yield new StringValue(text.substring(fromIndex, toIndex));
@@ -518,5 +508,19 @@ public class Evaluator {
 
             default -> throw new UnsupportedOperationException("Function is not implemented: " + call.name());
         };
+    }
+
+    private static int getFromIndex(String text, double start, double length) {
+        if (!Double.isFinite(start) || !Double.isFinite(length) || start != Math.rint(start) || length != Math.rint(length)) {
+            throw new IllegalArgumentException("SUBSTRING start and length must be finite integers.");
+        }
+
+        double startIndex = start - 1;
+
+        if (startIndex < 0 || startIndex > text.length() || length < 0 || length > text.length() - startIndex) {
+            throw new IllegalArgumentException("SUBTRING range is outside the string.");
+        }
+
+        return (int) startIndex;
     }
 }
