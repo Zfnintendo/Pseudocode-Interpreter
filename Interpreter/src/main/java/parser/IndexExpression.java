@@ -22,7 +22,7 @@ public class IndexExpression implements ast.IndexExpression {
 
     @Override
     public Assignable base() {
-        return this.base();
+        return this.base;
     }
 
     @Override
