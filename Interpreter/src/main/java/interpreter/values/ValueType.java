@@ -6,4 +6,5 @@ public enum ValueType {
     character,
     nullValue,
     booleanValue,
+    array,
 }
