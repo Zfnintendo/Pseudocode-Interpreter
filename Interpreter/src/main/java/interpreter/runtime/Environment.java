@@ -23,6 +23,16 @@ public class Environment {
         this.variables.put(key, new VariableEntry(type));
     }
 
+    public void declareVariable(String name, TypeSpecification type, RuntimeValue initialValue) {
+        String key = this.key(name);
+
+        if (this.variables.containsKey(key)) {
+            throw new IllegalArgumentException("Name already declared: " + name);
+        }
+
+        this.variables.put(key, new VariableEntry(type, initialValue, false));
+    }
+
     public void declareConstant(String name, TypeSpecification type, RuntimeValue value) {
         String key = this.key(name);
 

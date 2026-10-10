@@ -420,6 +420,30 @@ public class Evaluator {
             throw new UnsupportedOperationException("Only scalar declarations are supported yet.");
         }
 
+        if (declaration.declaredType() instanceof ArrayType arrayType) {
+            int dimensions = arrayType.bounds().size();
+
+            if (dimensions < 1 || dimensions > 2 || !(arrayType.elementType() instanceof ScalarType elementType)) {
+                throw new UnsupportedOperationException("Only one dimensional or two dimensional arrays are supported.");
+            }
+
+            int[] lower = new int[dimensions];
+            int[] upper = new int[dimensions];
+
+            for (int i = 0; i < dimensions; i++) {
+                ArrayBounds bounds = arrayType.bounds().get(i);
+
+                lower[i] = evaluateArrayInteger(bounds.lower(), environment);
+                upper[i] = evaluateArrayInteger(bounds.upper(), environment);
+            }
+
+            ArrayValue array = new ArrayValue(elementType, lower, upper);
+
+            environment.declareVariable(declaration.name(), arrayType, array);
+
+            return new NullValue();
+        }
+
         switch(type.tokenType()) {
             case typeInteger,typeReal, typeString, typeChar, typeBoolean -> environment.declareVariable(declaration.name(), type);
 
@@ -427,6 +451,20 @@ public class Evaluator {
         }
 
         return new NullValue();
+    }
+
+    private static int evaluateArrayInteger(Expression expression, Environment environment) {
+        RuntimeValue value = evaluate(expression, environment);
+
+        if (!(value instanceof NumberValue(double number))
+                || !Double.isFinite(number)
+                || number != Math.rint(number)
+                || number < Integer.MIN_VALUE
+                || number > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Array bounds and indices must be integers in the proper integer range.");
+        }
+
+        return (int) number;
     }
 
     public static RuntimeValue evaluateConstantDeclaration(ConstantDeclaration declaration, Environment environment) {
