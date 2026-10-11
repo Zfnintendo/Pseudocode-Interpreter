@@ -6,6 +6,7 @@ import ast.*;
 
 import java.util.Scanner;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public class Evaluator {
 
@@ -251,12 +252,26 @@ public class Evaluator {
     }
 
     public static RuntimeValue evaluateInput(Input input, Environment environment) {
-        if (!(input.target() instanceof Identifier target)) {
-            throw new UnsupportedOperationException("Array input is not implemented yet.");
-        }
+        TokenEnums tokenType;
+        Consumer<RuntimeValue> writeValue;
 
-        if (!(environment.declaredType(target.symbol()) instanceof ScalarType(lexer.TokenEnums tokenType))) {
-            throw new UnsupportedOperationException("INPUT requires a scalar variable.");
+        if (input.target() instanceof Identifier target) {
+            if (!(environment.declaredType(target.symbol()) instanceof ScalarType scalarType)) {
+                throw new UnsupportedOperationException("INPUT requires a scalar variable or an indexed array element.");
+            }
+
+            tokenType = scalarType.tokenType();
+            writeValue = value -> environment.assign(target.symbol(), value);
+        } else if (input.target() instanceof IndexExpression target) {
+            ArrayValue array = evaluateArrayBase(target, environment);
+            int[] indices = evaluateArrayIndices(target, environment);
+
+            array.validateIndices();
+
+            tokenType = array.elementType().tokenType();
+            writeValue = value -> array.assign(value, indices);
+        } else {
+            throw new UnsupportedOperationException("Unsupported INPUT target: " + input.target().kind());
         }
 
         if (!inputScanner.hasNextLine()) {
@@ -305,7 +320,7 @@ public class Evaluator {
             default -> throw new UnsupportedOperationException("Unsupported input type: " + tokenType);
         };
 
-        environment.assign(target.symbol(), value);
+        writeValue.accept(value);
         return new NullValue();
     }
 

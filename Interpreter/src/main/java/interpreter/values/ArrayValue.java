@@ -88,4 +88,8 @@ public class ArrayValue implements RuntimeValue {
         this.elements[this.offset(indices)].assign(value);
     }
 
+    public void validateIndices(int... indices) {
+        offset(indices);
+    }
+
 }
