@@ -43,6 +43,7 @@ public class Evaluator {
 
             case NodeType.binaryExpression -> evaluateBinaryExpression( (BinaryExpression) astNode, environment);
             case NodeType.unaryExpression -> evaluateUnaryExpression( (UnaryExpression) astNode, environment);
+            case NodeType.indexExpression -> evaluateIndexExpression( (IndexExpression) astNode, environment);
 
             case NodeType.ifStatement -> evaluateIfStatement( (IfStatement) astNode, environment);
             case NodeType.whileStatement -> evaluateWhileStatement( (WhileStatement) astNode, environment);
@@ -215,6 +216,13 @@ public class Evaluator {
           default -> throw new UnsupportedOperationException("Unsupported unary operator: " + expression.operator());
         };
 
+    }
+
+    public static RuntimeValue evaluateIndexExpression(IndexExpression expression, Environment environment) {
+        ArrayValue array = evaluateArrayBase(expression, environment);
+        int[] indices = evaluateArrayIndices(expression, environment);
+
+        return array.read(indices);
     }
 
     private static String formatOutput(RuntimeValue value) {
@@ -468,6 +476,26 @@ public class Evaluator {
         return (int) number;
     }
 
+    private static int[] evaluateArrayIndices(IndexExpression expression, Environment environment) {
+        int[] indices = new int[expression.indices().size()];
+
+        for (int i = 0; i < indices.length; i++) {
+            indices[i] = evaluateArrayInteger(expression.indices().get(i), environment);
+        }
+
+        return indices;
+    }
+
+    private static ArrayValue evaluateArrayBase(IndexExpression expression, Environment environment) {
+        RuntimeValue base = evaluate(expression.base(), environment);
+
+        if (!(base instanceof ArrayValue array)) {
+            throw new IllegalArgumentException("Indexing requires an array.");
+        }
+
+        return array;
+    }
+
     public static RuntimeValue evaluateConstantDeclaration(ConstantDeclaration declaration, Environment environment) {
         RuntimeValue value = evaluate(declaration.value(), environment);
 
@@ -492,15 +520,24 @@ public class Evaluator {
     }
 
     public static RuntimeValue evaluateAssignment(Assignment assignment, Environment environment) {
-        if (!(assignment.target() instanceof Identifier target)) {
-            throw new UnsupportedOperationException("Array assignment is not implmented yet.");
+        if (assignment.target() instanceof Identifier target) {
+            RuntimeValue value = evaluate(assignment.value(), environment);
+            environment.assign(target.symbol(), value);
+
+            return new NullValue();
         }
 
-        RuntimeValue value = evaluate(assignment.value(), environment);
+        if (assignment.target() instanceof IndexExpression target) {
+            ArrayValue array = evaluateArrayBase(target, environment);
+            int[] indices = evaluateArrayIndices(target, environment);
+            RuntimeValue value = evaluate(assignment.value(), environment);
 
-        environment.assign(target.symbol(), value);
+            array.assign(value, indices);
 
-        return new NullValue();
+            return new NullValue();
+        }
+
+        throw new UnsupportedOperationException("Unsupported assignment target: " + assignment.target().kind());
     }
 
     public static RuntimeValue evaluateCallExpression(CallExpression call, Environment environment) {
