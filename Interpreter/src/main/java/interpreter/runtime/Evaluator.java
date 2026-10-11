@@ -416,9 +416,6 @@ public class Evaluator {
     }
 
     public static RuntimeValue evaluateVariableDeclaration(VariableDeclaration declaration, Environment environment) {
-        if (!(declaration.declaredType() instanceof ScalarType type)) {
-            throw new UnsupportedOperationException("Only scalar declarations are supported yet.");
-        }
 
         if (declaration.declaredType() instanceof ArrayType arrayType) {
             int dimensions = arrayType.bounds().size();
@@ -442,6 +439,10 @@ public class Evaluator {
             environment.declareVariable(declaration.name(), arrayType, array);
 
             return new NullValue();
+        }
+
+        if (!(declaration.declaredType() instanceof ScalarType type)) {
+            throw new UnsupportedOperationException("Unsupported declaration type.");
         }
 
         switch(type.tokenType()) {
