@@ -1,6 +1,8 @@
 package interpreter.runtime;
 
 import ast.TypeSpecification;
+import ast.FunctionDeclaration;
+import ast.ProcedureDeclaration;
 import interpreter.values.RuntimeValue;
 
 import java.util.HashMap;
@@ -8,6 +10,18 @@ import java.util.Map;
 
 public class Environment {
     private final Map<String, VariableEntry> variables = new HashMap<>();
+    private final Map<String, FunctionEntry> functions = new HashMap<>();
+    private final Map<String, ProcedureEntry>  procedures = new HashMap<>();
+
+    private final Environment parent;
+
+    public Environment() {
+        this(null);
+    }
+
+    public Environment(Environment parent) {
+        this.parent = parent;
+    }
 
     private String key(String name) {
         return name;
@@ -46,11 +60,15 @@ public class Environment {
     private VariableEntry lookup(String name) {
         VariableEntry entry = this.variables.get(this.key(name));
 
-        if (entry == null) {
-            throw new IllegalArgumentException("Name was not declared: " + name);
+        if (entry != null) {
+            return entry;
         }
 
-        return entry;
+        if (this.parent != null) {
+            return this.parent.lookup(name);
+        }
+
+        throw new IllegalArgumentException("Name was not declared: " + name);
     }
 
     public RuntimeValue read(String name) {
@@ -75,6 +93,26 @@ public class Environment {
 
     public TypeSpecification declaredType(String name) {
         return this.lookup(name).declaredType();
+    }
+
+    public void declareFunction(FunctionDeclaration declaration) {
+        checkSubroutineName(declaration.name());
+
+        functions.put(this.key(declaration.name()), new FunctionEntry(declaration, this));
+    }
+
+    public void declareProceedure(ProcedureDeclaration declaration) {
+        checkSubroutineName(declaration.name());
+
+        procedures.put(this.key(declaration.name()), new ProcedureEntry(declaration, this));
+    }
+
+    private void checkSubroutineName(String name) {
+        String key = this.key(name);
+
+        if (functions.containsKey(key)  || procedures.containsKey(key)) {
+            throw new IllegalArgumentException("Subroutine already declared: " + name);
+        }
     }
 
 }
