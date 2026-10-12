@@ -56,6 +56,8 @@ public class Evaluator {
 
             case NodeType.constantDeclaration -> evaluateConstantDeclaration( (ConstantDeclaration) astNode, environment);
             case NodeType.variableDeclaration -> evaluateVariableDeclaration( (VariableDeclaration) astNode, environment);
+            case NodeType.functionDeclaration -> evaluateFunctionDeclaration( (FunctionDeclaration) astNode, environment);
+            case NodeType.procedureDeclaration -> evaluateProcedureDeclaration( (ProcedureDeclaration) astNode, environment);
 
             case NodeType.identifier -> {
                 Identifier identifier = (Identifier) astNode;
@@ -531,6 +533,16 @@ public class Evaluator {
 
         environment.declareConstant(declaration.name(), new ScalarType(tokenType), value);
 
+        return new NullValue();
+    }
+
+    public static RuntimeValue evaluateFunctionDeclaration(FunctionDeclaration declaration, Environment environment) {
+        environment.declareFunction(declaration);
+        return new NullValue();
+    }
+
+    public static RuntimeValue evaluateProcedureDeclaration(ProcedureDeclaration declaration, Environment environment) {
+        environment.declareProcedure(declaration);
         return new NullValue();
     }
 

@@ -101,10 +101,48 @@ public class Environment {
         functions.put(this.key(declaration.name()), new FunctionEntry(declaration, this));
     }
 
-    public void declareProceedure(ProcedureDeclaration declaration) {
+    public void declareProcedure(ProcedureDeclaration declaration) {
         checkSubroutineName(declaration.name());
 
         procedures.put(this.key(declaration.name()), new ProcedureEntry(declaration, this));
+    }
+
+    public FunctionEntry lookupFunction(String name) {
+        String key = this.key(name);
+        FunctionEntry entry = functions.get(key);
+
+        if (entry != null) {
+            return entry;
+        }
+
+        if (procedures.containsKey(key)) {
+            throw new IllegalArgumentException("Expected a function, but found a procedure: " + name);
+        }
+
+        if (parent != null) {
+            return parent.lookupFunction(name);
+        }
+
+        throw new IllegalArgumentException("Function was not declared: " + name);
+    }
+
+    public ProcedureEntry lookupProcedure(String name) {
+        String key = this.key(name);
+        ProcedureEntry entry = procedures.get(key);
+
+        if (entry != null) {
+            return entry;
+        }
+
+        if (functions.containsKey(key)) {
+            throw new IllegalArgumentException("Expected a procedure, but found a function: " + name);
+        }
+
+        if (parent != null) {
+            return parent.lookupProcedure(name);
+        }
+
+        throw new IllegalArgumentException("Procedure was not declared: " + name);
     }
 
     private void checkSubroutineName(String name) {
