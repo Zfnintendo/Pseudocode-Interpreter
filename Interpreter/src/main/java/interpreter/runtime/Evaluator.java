@@ -59,10 +59,7 @@ public class Evaluator {
             case NodeType.functionDeclaration -> evaluateFunctionDeclaration( (FunctionDeclaration) astNode, environment);
             case NodeType.procedureDeclaration -> evaluateProcedureDeclaration( (ProcedureDeclaration) astNode, environment);
 
-            case NodeType.identifier -> {
-                Identifier identifier = (Identifier) astNode;
-                yield environment.read(identifier.symbol());
-            }
+            case NodeType.identifier -> evaluateIdentifier( (Identifier) astNode, environment);
 
             case NodeType.assignment -> evaluateAssignment( (Assignment) astNode, environment);
 
@@ -258,11 +255,11 @@ public class Evaluator {
         Consumer<RuntimeValue> writeValue;
 
         if (input.target() instanceof Identifier target) {
-            if (!(environment.declaredType(target.symbol()) instanceof ScalarType scalarType)) {
+            if (!(environment.declaredType(target.symbol()) instanceof ScalarType(TokenEnums type))) {
                 throw new UnsupportedOperationException("INPUT requires a scalar variable or an indexed array element.");
             }
 
-            tokenType = scalarType.tokenType();
+            tokenType = type;
             writeValue = value -> environment.assign(target.symbol(), value);
         } else if (input.target() instanceof IndexExpression target) {
             ArrayValue array = evaluateArrayBase(target, environment);
@@ -565,6 +562,10 @@ public class Evaluator {
         }
 
         throw new UnsupportedOperationException("Unsupported assignment target: " + assignment.target().kind());
+    }
+
+    public static RuntimeValue evaluateIdentifier(Identifier identifier, Environment environment) {
+        return environment.read(identifier.symbol());
     }
 
     public static RuntimeValue evaluateCallExpression(CallExpression call, Environment environment) {
