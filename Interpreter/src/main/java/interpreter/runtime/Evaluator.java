@@ -51,6 +51,7 @@ public class Evaluator {
             case NodeType.repeatStatement -> evaluateRepeatStatement( (RepeatStatement) astNode, environment);
             case NodeType.forStatement -> evaluateForStatement( (ForStatement) astNode, environment);
             case NodeType.caseStatement -> evaluateCaseStatement( (CaseStatement) astNode, environment);
+            case NodeType.callStatement -> evaluateCallStatement(  (CallStatement) astNode, environment);
 
             case NodeType.callExpression -> evaluateCallExpression( (CallExpression) astNode, environment);
 
@@ -432,6 +433,46 @@ public class Evaluator {
 
         if (statement.otherwiseCase().isPresent()) {
             evaluate(statement.otherwiseCase().get(), environment);
+        }
+
+        return new NullValue();
+    }
+
+    public static RuntimeValue evaluateCallStatement(CallStatement statement, Environment environment) {
+        CallExpression call = statement.call();
+
+        ProcedureEntry entry = environment.lookupProcedure(call.name());
+        ProcedureDeclaration declaration = entry.declaration();
+
+        var parameters = declaration.parameters();
+        var arguments = call.arguments();
+
+        if (arguments.size() != parameters.size()) {
+            throw new IllegalArgumentException(call.name() + " requires " + parameters.size() + " arguments, got " + arguments.size());
+        }
+
+        for (Parameter parameter : parameters) {
+            if (!(parameter.type() instanceof ScalarType)) {
+                throw new UnsupportedOperationException("Only scalar procedure parameters are supported currently.");
+            }
+        }
+
+        RuntimeValue[] values =  new RuntimeValue[arguments.size()];
+
+        for (int i = 0; i < arguments.size(); i++) {
+            values[i] = evaluate(arguments.get(i), environment);
+        }
+
+        Environment local = new Environment(entry.declarationEnvironment());
+
+        for (int i = 0; i < parameters.size(); i++) {
+            Parameter parameter = parameters.get(i);
+
+            local.declareVariable(parameter.name(), parameter.type(), values[i]);
+        }
+
+        for (Statement bodyStatement : declaration.body()) {
+            evaluate(bodyStatement, local);
         }
 
         return new NullValue();
