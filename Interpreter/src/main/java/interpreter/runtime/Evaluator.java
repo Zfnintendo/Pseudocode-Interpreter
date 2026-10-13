@@ -451,12 +451,6 @@ public class Evaluator {
             throw new IllegalArgumentException(call.name() + " requires " + parameters.size() + " arguments, got " + arguments.size());
         }
 
-        for (Parameter parameter : parameters) {
-            if (!(parameter.type() instanceof ScalarType)) {
-                throw new UnsupportedOperationException("Only scalar procedure parameters are supported currently.");
-            }
-        }
-
         RuntimeValue[] values =  new RuntimeValue[arguments.size()];
 
         for (int i = 0; i < arguments.size(); i++) {
@@ -467,8 +461,13 @@ public class Evaluator {
 
         for (int i = 0; i < parameters.size(); i++) {
             Parameter parameter = parameters.get(i);
+            RuntimeValue value = values[i];
 
-            local.declareVariable(parameter.name(), parameter.type(), values[i]);
+            if (parameter.type() instanceof ArrayType arrayType) {
+                validateArrayParameter(parameter, arrayType, value, local);
+            }
+
+            local.declareVariable(parameter.name(), parameter.type(), value);
         }
 
         for (Statement bodyStatement : declaration.body()) {
@@ -476,6 +475,33 @@ public class Evaluator {
         }
 
         return new NullValue();
+    }
+
+    private static void validateArrayParameter(Parameter parameter, ArrayType expected, RuntimeValue value, Environment local) {
+        if (!(value instanceof ArrayValue array)) {
+            throw new IllegalArgumentException("Parameter '" + parameter.name() + "' requires an array.");
+        }
+
+        int dimensions = expected.bounds().size();
+
+        if (dimensions < 1 || dimensions > 2 || !(expected.elementType() instanceof ScalarType elementType)) {
+            throw new UnsupportedOperationException("Only one dimensional or two dimensional arrays are supported currently.");
+        }
+
+        if (array.dimensions() != dimensions || !array.elementType().equals(elementType)) {
+            throw new IllegalArgumentException("Array dimensions or element type do not match parameter '" + parameter.name() + "'.");
+        }
+
+        for (int i = 0; i < dimensions; i++) {
+            ArrayBounds bounds = expected.bounds().get(i);
+
+            int lower = evaluateArrayInteger(bounds.lower(), local);
+            int upper = evaluateArrayInteger(bounds.upper(), local);
+
+            if (lower != array.lowerBound(i) || upper != array.upperBound(i)) {
+                throw new IllegalArgumentException("Array bounds do not match parameter '" + parameter.name() + "' in dimensions " + (i + 1));
+            }
+        }
     }
 
     public static RuntimeValue evaluateVariableDeclaration(VariableDeclaration declaration, Environment environment) {

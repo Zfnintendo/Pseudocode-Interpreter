@@ -92,4 +92,12 @@ public class ArrayValue implements RuntimeValue {
         offset(indices);
     }
 
+    public int lowerBound(int dimension) {
+        return lowerBounds[dimension];
+    }
+
+    public int upperBound(int dimension) {
+        return upperBounds[dimension];
+    }
+
 }
