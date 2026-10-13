@@ -52,6 +52,7 @@ public class Evaluator {
             case NodeType.forStatement -> evaluateForStatement( (ForStatement) astNode, environment);
             case NodeType.caseStatement -> evaluateCaseStatement( (CaseStatement) astNode, environment);
             case NodeType.callStatement -> evaluateCallStatement(  (CallStatement) astNode, environment);
+            case NodeType.returnStatement -> evaluateReturnStatement( (ReturnStatement) astNode, environment);
 
             case NodeType.callExpression -> evaluateCallExpression( (CallExpression) astNode, environment);
 
@@ -75,8 +76,12 @@ public class Evaluator {
     public static RuntimeValue evaluateProgram(Program program, Environment environment) {
         RuntimeValue lastEvaluated = new NullValue();
 
-        for (Statement statement : program.body()) {
-            lastEvaluated = evaluate(statement, environment);
+        try {
+            for (Statement statement : program.body()) {
+                lastEvaluated = evaluate(statement, environment);
+            }
+        } catch (ReturnSignal signal) {
+            throw new IllegalStateException("RETURN is only allowed inside a function.");
         }
 
         return lastEvaluated;
@@ -266,7 +271,7 @@ public class Evaluator {
             ArrayValue array = evaluateArrayBase(target, environment);
             int[] indices = evaluateArrayIndices(target, environment);
 
-            array.validateIndices();
+            array.validateIndices(indices);
 
             tokenType = array.elementType().tokenType();
             writeValue = value -> array.assign(value, indices);
@@ -470,11 +475,67 @@ public class Evaluator {
             local.declareVariable(parameter.name(), parameter.type(), value);
         }
 
-        for (Statement bodyStatement : declaration.body()) {
-            evaluate(bodyStatement, local);
+        try {
+            for (Statement bodyStatement : declaration.body()) {
+                evaluate(bodyStatement, local);
+            }
+        } catch (ReturnSignal signal) {
+            throw new IllegalStateException("RETURN with a value is not allowed in a procedure.");
         }
 
         return new NullValue();
+    }
+
+    public static RuntimeValue evaluateReturnStatement(ReturnStatement statement, Environment environment) {
+        RuntimeValue value = evaluate(statement.value(), environment);
+        throw new ReturnSignal(value);
+    }
+
+    public static RuntimeValue evaluateUserFunction(CallExpression call, Environment environment) {
+        FunctionEntry entry = environment.lookupFunction(call.name());
+        FunctionDeclaration declaration = entry.declaration();
+
+        if (!(declaration.returnType() instanceof ScalarType returnType)) {
+            throw new UnsupportedOperationException("Only scalar function return types are supported currently.");
+        }
+
+        var parameters = declaration.parameters();
+        var arguments = call.arguments();
+
+        if (arguments.size() != parameters.size()) {
+            throw new IllegalArgumentException(call.name() + " requires " + parameters.size() + " arguments, got " + arguments.size());
+        }
+
+        RuntimeValue[] values = new RuntimeValue[arguments.size()];
+
+        for (int i = 0; i < arguments.size(); i++) {
+            values[i] = evaluate(arguments.get(i), environment);
+        }
+
+        Environment local = new Environment(entry.declarationEnvironment());
+
+        for (int i = 0; i < parameters.size(); i++) {
+            Parameter parameter = parameters.get(i);
+            RuntimeValue value = values[i];
+
+            if (parameter.type() instanceof ArrayType arrayType) {
+                validateArrayParameter(parameter, arrayType, value, local);
+            }
+
+            local.declareVariable(parameter.name(), parameter.type(), value);
+        }
+
+        try {
+            for (Statement bodyStatement : declaration.body()) {
+                evaluate(bodyStatement, local);
+            }
+        } catch (ReturnSignal signal) {
+            VariableEntry result = new VariableEntry(returnType, signal.value(), false);
+
+            return result.value();
+        }
+
+        throw new IllegalStateException("Function '"  + call.name() + "' finished without RETURN.");
     }
 
     private static void validateArrayParameter(Parameter parameter, ArrayType expected, RuntimeValue value, Environment local) {
@@ -677,7 +738,7 @@ public class Evaluator {
                 yield new StringValue(text.substring(fromIndex, toIndex));
             }
 
-            default -> throw new UnsupportedOperationException("Function is not implemented: " + call.name());
+            default -> evaluateUserFunction(call, environment);
         };
     }
 
