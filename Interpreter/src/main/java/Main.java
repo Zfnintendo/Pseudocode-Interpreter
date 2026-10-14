@@ -19,11 +19,6 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException { // main function for interpreting
         System.out.println("Pseudocode Interpreter made by Zeftarium!");
 
-        /* todo
-            - make the interpreter
-            - WORK ON README FOR DOCUMENTATION PURPOSES!
-         */
-
         // start of main
 
         MainReader mainReader = new MainReader(args);

@@ -30,6 +30,16 @@ See [LICENSE](LICENSE), particularly sections 15–17, for the applicable
 warranty disclaimer and limitation of liability. This notice summarises
 those provisions and does not replace or modify the licence.
 
+## Installation
+
+todo: 
+- add the jar file somewhere
+- add installation instructions
+- add example pseudocode folder
+- finish evaluator and interpreter
+- finish cli
+
+
 ### Lexer
 
 The lexer is split into many small parts with the biggest part being the Line Tokenizer, 
