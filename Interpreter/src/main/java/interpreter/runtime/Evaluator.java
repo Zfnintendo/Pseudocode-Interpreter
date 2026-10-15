@@ -57,6 +57,7 @@ public class Evaluator {
             case NodeType.openFileStatement -> evaluateOpenFileStatement( (OpenFileStatement) astNode, environment);
             case NodeType.closeFileStatement -> evaluateCloseFileStatement( (CloseFileStatement) astNode, environment);
             case NodeType.writeFileStatement -> evaluateWriteFileStatement( (WriteFileStatement) astNode, environment);
+            case NodeType.readFileStatement -> evaluateReadFileStatement( (ReadFileStatement) astNode, environment);
 
             case NodeType.callExpression -> evaluateCallExpression( (CallExpression) astNode, environment);
 
@@ -289,13 +290,20 @@ public class Evaluator {
 
         String text = inputScanner.nextLine();
 
-        RuntimeValue value = switch(tokenType) {
+        RuntimeValue value = parseInputValue(text, tokenType);
+
+        writeValue.accept(value);
+        return new NullValue();
+    }
+
+    private static RuntimeValue parseInputValue(String text, TokenEnums tokenType) {
+        return switch(tokenType) {
             case TokenEnums.typeInteger, TokenEnums.typeReal -> {
                 double number;
 
                 try {
                     number = Double.parseDouble(text.trim());
-                } catch(NumberFormatException exception) {
+                } catch (NumberFormatException exception) {
                     throw new IllegalArgumentException("Expected numeric input, got: " + text, exception);
                 }
 
@@ -307,7 +315,7 @@ public class Evaluator {
             }
             case TokenEnums.typeString -> new StringValue(text);
             case TokenEnums.typeChar -> {
-                if (text.length() != 1 ) {
+                if (text.length() != 1) {
                     throw new IllegalArgumentException("CHAR input must contain exactly one character.");
                 }
 
@@ -328,9 +336,6 @@ public class Evaluator {
 
             default -> throw new UnsupportedOperationException("Unsupported input type: " + tokenType);
         };
-
-        writeValue.accept(value);
-        return new NullValue();
     }
 
     public static RuntimeValue evaluateIfStatement(IfStatement statement, Environment environment) {
@@ -783,6 +788,39 @@ public class Evaluator {
         String text = formatOutput(value);
 
         environment.files().writeLine(filename, text);
+
+        return new NullValue();
+    }
+
+    public static RuntimeValue evaluateReadFileStatement(ReadFileStatement statement, Environment environment) {
+        String filename = evaluateFilename(statement.filename(), environment);
+
+        TokenEnums tokenType;
+        Consumer<RuntimeValue> writeValue;
+
+        if (statement.target() instanceof Identifier target) {
+            if (!(environment.declaredType(target.symbol()) instanceof ScalarType scalarType)) {
+                throw new UnsupportedOperationException("READFILE requires a scalar variable or an indexed array element.");
+            }
+
+            tokenType = scalarType.tokenType();
+            writeValue = value -> environment.assign(target.symbol(), value);
+        } else if (statement.target() instanceof IndexExpression target) {
+            ArrayValue array = evaluateArrayBase(target, environment);
+            int[] indices = evaluateArrayIndices(target, environment);
+
+            array.validateIndices(indices);
+
+            tokenType = array.elementType().tokenType();
+            writeValue = value -> array.assign(value, indices);
+        } else {
+            throw new UnsupportedOperationException("Unsupported READFILE target: " + statement.target().kind());
+        }
+
+        String text = environment.files().readLine(filename);
+        RuntimeValue value = parseInputValue(text, tokenType);
+
+        writeValue.accept(value);
 
         return new NullValue();
     }

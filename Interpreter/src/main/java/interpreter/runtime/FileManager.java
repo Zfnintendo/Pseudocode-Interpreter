@@ -6,6 +6,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.BufferedWriter;
+import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -89,6 +90,23 @@ public class FileManager implements AutoCloseable {
             writer.newLine();
         } catch (IOException exception) {
             throw new UncheckedIOException("Could not write to file: " + filename, exception);
+        }
+    }
+
+    public String readLine(String filename) {
+        OpenFile file = requireFile(filename, FileMode.READ);
+        BufferedReader reader = (BufferedReader) file.stream();
+
+        try {
+            String line = reader.readLine();
+
+            if (line == null) {
+                throw new IllegalStateException("End of file reached: " + filename);
+            }
+
+            return line;
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Could not read from file: " + filename, exception);
         }
     }
 
