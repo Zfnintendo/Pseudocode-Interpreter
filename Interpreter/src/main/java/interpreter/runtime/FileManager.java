@@ -21,7 +21,7 @@ public class FileManager implements AutoCloseable {
         return Path.of(filename).toAbsolutePath().normalize();
     }
 
-    public void Open(String filename, FileMode mode) {
+    public void open(String filename, FileMode mode) {
         Path path = key(filename);
 
         if (files.containsKey(path)) {

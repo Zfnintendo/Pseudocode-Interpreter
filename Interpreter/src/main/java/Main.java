@@ -5,10 +5,8 @@ import lexer.MainLexer;
 import parser.MainParser;
 import parser.Program;
 
+import interpreter.MainInterpreter;
 import interpreter.AstPrinter;
-import interpreter.runtime.Environment;
-import interpreter.runtime.Evaluator;
-import interpreter.values.NumberValue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,9 +43,7 @@ public class Main {
 
             AstPrinter.printTree(abstractSyntaxTree);
 
-            Environment env = new Environment();
-
-            Evaluator.evaluate(abstractSyntaxTree, env);
+            MainInterpreter.interpret(abstractSyntaxTree);
 
         } else {
 

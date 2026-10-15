@@ -54,6 +54,9 @@ public class Evaluator {
             case NodeType.callStatement -> evaluateCallStatement(  (CallStatement) astNode, environment);
             case NodeType.returnStatement -> evaluateReturnStatement( (ReturnStatement) astNode, environment);
 
+            case NodeType.openFileStatement -> evaluateOpenFileStatement( (OpenFileStatement) astNode, environment);
+            case NodeType.closeFileStatement -> evaluateCloseFileStatement( (CloseFileStatement) astNode, environment);
+
             case NodeType.callExpression -> evaluateCallExpression( (CallExpression) astNode, environment);
 
             case NodeType.constantDeclaration -> evaluateConstantDeclaration( (ConstantDeclaration) astNode, environment);
@@ -754,5 +757,31 @@ public class Evaluator {
         }
 
         return (int) startIndex;
+    }
+
+    public static RuntimeValue evaluateOpenFileStatement(OpenFileStatement statement, Environment environment) {
+        String filename = evaluateFilename(statement.filename(), environment);
+
+        environment.files().open(filename, statement.mode());
+
+        return new NullValue();
+    }
+
+    public static RuntimeValue evaluateCloseFileStatement(CloseFileStatement statement, Environment environment) {
+        String filename = evaluateFilename(statement.filename(), environment);
+
+        environment.files().close(filename);
+
+        return new NullValue();
+    }
+
+    private static String evaluateFilename(Expression expression, Environment environment) {
+        RuntimeValue value = evaluate(expression, environment);
+
+        if (!(value instanceof StringValue(String filename))) {
+            throw new IllegalArgumentException("Filename must be a STRING.");
+        }
+
+        return filename;
     }
 }

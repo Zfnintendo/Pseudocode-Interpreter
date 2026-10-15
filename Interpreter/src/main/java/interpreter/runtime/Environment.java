@@ -13,6 +13,8 @@ public class Environment {
     private final Map<String, FunctionEntry> functions = new HashMap<>();
     private final Map<String, ProcedureEntry>  procedures = new HashMap<>();
 
+    private final FileManager files;
+
     private final Environment parent;
 
     public Environment() {
@@ -21,10 +23,15 @@ public class Environment {
 
     public Environment(Environment parent) {
         this.parent = parent;
+        this.files = parent == null ? new FileManager() : parent.files;
     }
 
     private String key(String name) {
         return name;
+    }
+
+    public FileManager files() {
+        return files;
     }
 
     public void declareVariable(String name, TypeSpecification type) {
