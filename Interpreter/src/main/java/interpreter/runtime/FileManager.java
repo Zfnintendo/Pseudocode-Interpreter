@@ -5,6 +5,7 @@ import ast.FileMode;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -77,6 +78,32 @@ public class FileManager implements AutoCloseable {
         if (failure != null) {
             throw new UncheckedIOException("Could not close all files.", failure);
         }
+    }
+
+    public void writeLine(String filename, String text) {
+        OpenFile file = requireFile(filename, FileMode.WRITE);
+        BufferedWriter writer = (BufferedWriter) file.stream();
+
+        try {
+            writer.write(text);
+            writer.newLine();
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Could not write to file: " + filename, exception);
+        }
+    }
+
+    private OpenFile requireFile(String filename, FileMode requiredMode) {
+        OpenFile file = files.get(key(filename));
+
+        if (file == null) {
+            throw new IllegalStateException("File is not open: " + filename);
+        }
+
+        if (file.mode() != requiredMode) {
+            throw new IllegalStateException("File must be opened for " + requiredMode + ": " + filename);
+        }
+
+        return file;
     }
 
 }

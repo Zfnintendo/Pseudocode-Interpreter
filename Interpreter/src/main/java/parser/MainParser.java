@@ -330,7 +330,7 @@ public class MainParser {
 
         this.expect(TokenEnums.comma, "Expected ',' after file name.");
 
-        ast.Expression value = this.parseTarget();
+        ast.Expression value = this.parseExpression();
 
         return new WriteFileStatement(filename, value);
     }

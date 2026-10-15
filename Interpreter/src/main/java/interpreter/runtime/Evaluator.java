@@ -56,6 +56,7 @@ public class Evaluator {
 
             case NodeType.openFileStatement -> evaluateOpenFileStatement( (OpenFileStatement) astNode, environment);
             case NodeType.closeFileStatement -> evaluateCloseFileStatement( (CloseFileStatement) astNode, environment);
+            case NodeType.writeFileStatement -> evaluateWriteFileStatement( (WriteFileStatement) astNode, environment);
 
             case NodeType.callExpression -> evaluateCallExpression( (CallExpression) astNode, environment);
 
@@ -771,6 +772,17 @@ public class Evaluator {
         String filename = evaluateFilename(statement.filename(), environment);
 
         environment.files().close(filename);
+
+        return new NullValue();
+    }
+
+    public static RuntimeValue evaluateWriteFileStatement(WriteFileStatement statement, Environment environment) {
+        String filename = evaluateFilename(statement.filename(), environment);
+
+        RuntimeValue value = evaluate(statement.value(), environment);
+        String text = formatOutput(value);
+
+        environment.files().writeLine(filename, text);
 
         return new NullValue();
     }
