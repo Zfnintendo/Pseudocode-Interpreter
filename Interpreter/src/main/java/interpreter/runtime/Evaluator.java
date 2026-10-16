@@ -193,7 +193,7 @@ public class Evaluator {
                 }
 
                 if (right == 0.0) {
-                    throw new ArithmeticException(operator + " can not use a zero divisior");
+                    throw new ArithmeticException(operator + " can not use a zero divisor");
                 }
 
                 if (operator.equals("MOD")) {
@@ -206,7 +206,7 @@ public class Evaluator {
                 yield new NumberValue(truncated);
             }
 
-            default -> throw new UnsupportedOperationException("Operator can not be implemeneted into evaluator." + operator);
+            default -> throw new UnsupportedOperationException("Operator can not be implemented into evaluator." + operator);
         };
     }
 
@@ -750,7 +750,7 @@ public class Evaluator {
                 if (!(textValue instanceof StringValue(String text))
                         || !(startValue instanceof NumberValue(double start))
                         || !(lengthValue instanceof NumberValue(double length))) {
-                    throw new IllegalArgumentException("SUBSTRING requires a STRING followed by two indicies.");
+                    throw new IllegalArgumentException("SUBSTRING requires a STRING followed by two indices.");
                 }
 
                 int fromIndex = getFromIndex(text, start, length);
@@ -824,7 +824,7 @@ public class Evaluator {
         double startIndex = start - 1;
 
         if (startIndex < 0 || startIndex > text.length() || length < 0 || length > text.length() - startIndex) {
-            throw new IllegalArgumentException("SUBTRING range is outside the string.");
+            throw new IllegalArgumentException("SUBSTRING range is outside the string.");
         }
 
         return (int) startIndex;
