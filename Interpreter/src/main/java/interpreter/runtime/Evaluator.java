@@ -776,6 +776,14 @@ public class Evaluator {
 
                 yield new NumberValue(rounded);
             }
+            case "RANDOM" -> {
+                requireArgumentCount(call, 0);
+
+                long steps = 1L << 53;
+                long sample = ThreadLocalRandom.current().nextLong(steps + 1);
+
+                yield new NumberValue(sample / (double) steps);
+            }
 
             default -> evaluateUserFunction(call, environment);
         };
