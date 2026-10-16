@@ -791,7 +791,7 @@ public class Evaluator {
                 RuntimeValue rightValue = evaluate(call.arguments().get(1), environment);
 
                 if (!(leftValue instanceof NumberValue left) || !(rightValue instanceof NumberValue right)) {
-                    throw new IllegalArgumentException(call.name() + " requires two numeric arguments.")''
+                    throw new IllegalArgumentException(call.name() + " requires two numeric arguments.");
                 }
 
                 yield evaluateNumericBinaryExpression(left, right, call.name());
