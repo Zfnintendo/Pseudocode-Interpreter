@@ -784,6 +784,18 @@ public class Evaluator {
 
                 yield new NumberValue(sample / (double) steps);
             }
+            case "DIV", "MOD" -> {
+                requireArgumentCount(call, 2);
+
+                RuntimeValue leftValue = evaluate(call.arguments().getFirst(), environment);
+                RuntimeValue rightValue = evaluate(call.arguments().get(1), environment);
+
+                if (!(leftValue instanceof NumberValue left) || !(rightValue instanceof NumberValue right)) {
+                    throw new IllegalArgumentException(call.name() + " requires two numeric arguments.")''
+                }
+
+                yield evaluateNumericBinaryExpression(left, right, call.name());
+            }
 
             default -> evaluateUserFunction(call, environment);
         };
