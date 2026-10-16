@@ -7,6 +7,9 @@ import ast.*;
 import java.util.Scanner;
 import java.util.Locale;
 import java.util.function.Consumer;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Evaluator {
 
@@ -747,8 +750,41 @@ public class Evaluator {
                 yield new StringValue(text.substring(fromIndex, toIndex));
             }
 
+            case "ROUND" -> {
+                requireArgumentCount(call, 2);
+
+                RuntimeValue numberValue = evaluate(call.arguments().getFirst(), environment);
+                RuntimeValue placesValue = evaluate(call.arguments().get(1), environment);
+
+                if (!(numberValue instanceof NumberValue(double number)) || !(placesValue instanceof NumberValue(double places))) {
+                    throw new IllegalArgumentException("ROUND requires a number and an integer decimal place count.");
+                }
+
+                if (!Double.isFinite(number)) {
+                    throw new IllegalArgumentException("ROUND requires a finite number.");
+                }
+
+                if (!Double.isFinite(places) || places != Math.rint(places) || places < 0 || places > Integer.MAX_VALUE) {
+                    throw new IllegalArgumentException("ROUND places must be a non negative integer in the appropriate range.");
+                }
+
+                if (places >= 324) {
+                    yield new NumberValue(number);
+                }
+
+                double rounded = BigDecimal.valueOf(number).setScale((int) places, RoundingMode.HALF_UP).doubleValue();
+
+                yield new NumberValue(rounded);
+            }
+
             default -> evaluateUserFunction(call, environment);
         };
+    }
+
+    private static void requireArgumentCount(CallExpression call, int expected) {
+        if (call.arguments().size() != expected) {
+            throw new IllegalArgumentException(call.name() + " requires " + expected + " arguments, got " + call.arguments().size());
+        }
     }
 
     private static int getFromIndex(String text, double start, double length) {
@@ -799,11 +835,11 @@ public class Evaluator {
         Consumer<RuntimeValue> writeValue;
 
         if (statement.target() instanceof Identifier target) {
-            if (!(environment.declaredType(target.symbol()) instanceof ScalarType scalarType)) {
+            if (!(environment.declaredType(target.symbol()) instanceof ScalarType(TokenEnums type))) {
                 throw new UnsupportedOperationException("READFILE requires a scalar variable or an indexed array element.");
             }
 
-            tokenType = scalarType.tokenType();
+            tokenType = type;
             writeValue = value -> environment.assign(target.symbol(), value);
         } else if (statement.target() instanceof IndexExpression target) {
             ArrayValue array = evaluateArrayBase(target, environment);
