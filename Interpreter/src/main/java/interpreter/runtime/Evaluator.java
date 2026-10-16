@@ -710,25 +710,53 @@ public class Evaluator {
 
     public static RuntimeValue evaluateCallExpression(CallExpression call, Environment environment) {
         return switch(call.name()) {
-            case "LENGTH", "UCASE", "LCASE" -> {
-                if (call.arguments().size() != 1) {
-                    throw new IllegalArgumentException(call.name() + " requires exactly one argument.");
-                }
+            case "LENGTH" -> {
+                requireArgumentCount(call, 1);
 
                 RuntimeValue argument = evaluate(call.arguments().getFirst(), environment);
 
                 if (!(argument instanceof StringValue(String text))) {
-                    throw new IllegalArgumentException(call.name() + " requires a STRING argument.");
+                    throw new IllegalArgumentException("LENGTH requires a STRING argument.");
                 }
 
-                yield switch(call.name()) {
-                    case "LENGTH" -> new NumberValue(text.length());
-                    case "UCASE" -> new StringValue(text.toUpperCase(Locale.ROOT));
-                    case "LCASE" -> new StringValue(text.toLowerCase(Locale.ROOT));
-
-                    default -> throw new IllegalStateException("Unexpected string function: " + call.name());
-                };
+                yield new NumberValue(text.length());
             }
+            case "UCASE", "LCASE" -> {
+                requireArgumentCount(call, 1);
+
+                RuntimeValue argument = evaluate(call.arguments().getFirst(), environment);
+
+                boolean uppercase = call.name().equals("UCASE");
+
+                if (argument instanceof StringValue(String text)) {
+                    yield new StringValue(uppercase ? text.toUpperCase(Locale.ROOT) : text.toLowerCase(Locale.ROOT));
+                }
+
+                if (argument instanceof CharValue(char character)) {
+                    yield new CharValue(uppercase ? Character.toUpperCase(character) : Character.toLowerCase(character));
+                }
+
+                throw new IllegalArgumentException(call.name() + " requires a STRING or CHAR argument.");
+            }
+//            case "LENGTH", "UCASE", "LCASE" -> {
+//                if (call.arguments().size() != 1) {
+//                    throw new IllegalArgumentException(call.name() + " requires exactly one argument.");
+//                }
+//
+//                RuntimeValue argument = evaluate(call.arguments().getFirst(), environment);
+//
+//                if (!(argument instanceof StringValue(String text))) {
+//                    throw new IllegalArgumentException(call.name() + " requires a STRING argument.");
+//                }
+//
+//                yield switch(call.name()) {
+//                    case "LENGTH" -> new NumberValue(text.length());
+//                    case "UCASE" -> new StringValue(text.toUpperCase(Locale.ROOT));
+//                    case "LCASE" -> new StringValue(text.toLowerCase(Locale.ROOT));
+//
+//                    default -> throw new IllegalStateException("Unexpected string function: " + call.name());
+//                };
+//            }
             case "SUBSTRING" -> {
                 if (call.arguments().size() != 3) {
                     throw new IllegalArgumentException("SUBSTRING requires exactly 3 arguments.");
