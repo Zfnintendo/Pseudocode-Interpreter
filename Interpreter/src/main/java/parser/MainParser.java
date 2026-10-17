@@ -424,7 +424,11 @@ public class MainParser {
 
         String name = ((Token) tokenObject.getFirst()).getValue();
 
-        ArrayList<ast.Parameter> parameters = this.parseParameters();
+        ArrayList<ast.Parameter> parameters = new ArrayList<>();
+
+        if (this.currentType() == TokenEnums.leftParen) {
+            parameters = this.parseParameters();
+        }
 
         this.expect(TokenEnums.returns, "Expected RETURNS after parameters.");
 
@@ -446,7 +450,11 @@ public class MainParser {
 
         String name = ((Token) tokenObject.getFirst()).getValue();
 
-        ArrayList<ast.Parameter> parameters = this.parseParameters();
+        ArrayList<ast.Parameter> parameters = new ArrayList<>();
+
+        if (this.currentType() == TokenEnums.leftParen) {
+            parameters = this.parseParameters();
+        }
 
         this.expect(TokenEnums.eol, "Expected a new line after the declaration statement.");
 
